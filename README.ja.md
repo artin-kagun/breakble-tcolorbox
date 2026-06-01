@@ -287,6 +287,7 @@ nested behavior の確認資料:
 
 - `verification/nested-behavior/report.md`
 - `verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf`
+  ケースごとに元の tcolorbox と breakble 版を並べた比較 PDF
 - `verification/nested-behavior/pdf/a4-nested-title-mix.pdf`
 - `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`
 - `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`

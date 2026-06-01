@@ -7,7 +7,7 @@
 
 | case | PDF |
 | --- | --- |
-| A4 nested behavior, original left / breakble right | `verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf` |
+| A4 nested behavior, case-by-case original/breakble comparison | `verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf` |
 | Title/no-title mixed continuations | `verification/nested-behavior/pdf/a4-nested-title-mix.pdf` |
 | Deep title/no-title mixed continuations | `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf` |
 | Nested breakable stress cases | `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf` |
@@ -34,3 +34,12 @@
 - Four-level first-fragment frame bottoms: span 0.50 pt, limit 3.00 pt.
 - Titleless non-nested reference first fragment: 5.00 pt bottom gap.
 - Titleless nested first fragments for depths 2, 3, 4, 5, and 6: 6.00 pt, 6.00 pt, 6.00 pt, 5.00 pt, and 10.00 pt bottom gaps.
+
+## How to Read `a4-nested-behavior-side-by-side.pdf`
+
+This PDF is intentionally case-by-case, not page-number-by-page-number. For each
+case, the `start page` spread shows the original tcolorbox output on the left
+and the breakble-tcolorbox output on the right at the point where the nested box
+should start. The `following page` spread then shows the next relevant page for
+the same case. This makes the original blank-space failure and the breakble
+placement directly visible.

@@ -326,6 +326,7 @@ Nested behavior evidence:
 
 - `verification/nested-behavior/report.md`
 - `verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf`
+  case-by-case original/breakble comparison
 - `verification/nested-behavior/pdf/a4-nested-title-mix.pdf`
 - `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`
 - `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`
