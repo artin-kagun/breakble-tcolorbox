@@ -290,6 +290,7 @@ nested behavior の確認資料:
 - `verification/nested-behavior/pdf/a4-nested-title-mix.pdf`
 - `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`
 - `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`
+- `verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf`
 
 manual parity の出力は、manual parity script によって `verification/manual-parity/` 以下に生成されます。この検証では `docs/tcolorbox/tcolorbox.tex` をコンパイルし、そこから読み込まれる `tcolorbox.doc.*.tex` 断片を含めて、全ページを比較します。
 
@@ -321,6 +322,7 @@ scripts/run-full-verification.sh
 - `docs/nested-breakable-requirements.md`: nested breakable 挙動について開発中に固めた要件
 - `docs/tcolorbox/`: parity check に使う upstream documentation、standalone example sources、assets
 - `docs/readme-demo/`: README の比較画像に使う小さな A4 サンプル
+- `docs/samples/`: タイトルなし入れ子などの追加サンプル
 - `verification/example-parity/`: 生成済み parity report、source copies、side-by-side PDFs
 - `verification/nested-behavior/`: nested breakable の確認用レポートとPDF
 - `verification/manual-parity/`: 生成される manual parity report、source copies、rendered pages、side-by-side PDF

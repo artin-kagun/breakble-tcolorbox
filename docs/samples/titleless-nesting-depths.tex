@@ -1,0 +1,203 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[margin=22mm]{geometry}
+\usepackage{lipsum}
+\usepackage[most]{breakble-tcolorbox}
+
+\pagestyle{plain}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+\tcbset{
+  titleless depth box/.style={
+    enhanced,
+    breakable,
+    boxrule=0.55pt,
+    arc=1.2mm,
+    outer arc=1.2mm,
+    left=2.2mm,
+    right=2.2mm,
+    top=1.8mm,
+    bottom=1.8mm,
+    before skip=2.5mm,
+    after skip=2.5mm,
+  },
+  depth one/.style={titleless depth box,colframe=blue!75!black,colback=blue!3!white},
+  depth two/.style={titleless depth box,colframe=green!55!black,colback=green!3!white},
+  depth three/.style={titleless depth box,colframe=orange!85!black,colback=orange!3!white},
+  depth four/.style={titleless depth box,colframe=red!70!black,colback=red!3!white},
+  depth five/.style={titleless depth box,colframe=purple!70!black,colback=purple!3!white},
+  depth six/.style={titleless depth box,colframe=teal!65!black,colback=teal!3!white},
+}
+
+\newtcolorbox{depthone}{depth one}
+\newtcolorbox{depthtwo}{depth two}
+\newtcolorbox{depththree}{depth three}
+\newtcolorbox{depthfour}{depth four}
+\newtcolorbox{depthfive}{depth five}
+\newtcolorbox{depthsix}{depth six}
+
+\newcommand{\caselead}[1]{%
+  \clearpage
+  {\Large\bfseries #1\par}
+  \medskip
+  Every box in this case is a breakable tcolorbox without a title option.
+  The visible labels below are ordinary body text, not tcolorbox titles.
+  The page breaks are caused by the amount of prose, not by explicit breaks
+  inside the boxes.
+  \medskip
+}
+
+\newcommand{\innertext}{%
+  \lipsum[1-5]
+  \medskip
+  \lipsum[6-9]
+}
+
+\begin{document}
+
+\begin{center}
+{\LARGE Titleless Nested Breakable Boxes}\\[3mm]
+{\large Depth 2, 3, 4, 5, and 6}
+\end{center}
+
+\bigskip
+This sample intentionally uses no tcolorbox titles. It is for checking that
+titleless nested breakable boxes do not acquire unwanted vertical title
+clearance when the nesting depth changes.
+
+\caselead{Depth 2: no titles}
+\begin{depthone}
+Level 1 opening text.
+
+\begin{depthtwo}
+Level 2 opening text.
+
+\innertext
+
+Level 2 closing text.
+\end{depthtwo}
+
+Level 1 closing text.
+\end{depthone}
+
+\caselead{Depth 3: no titles}
+\begin{depthone}
+Level 1 opening text.
+
+\begin{depthtwo}
+Level 2 opening text.
+
+\begin{depththree}
+Level 3 opening text.
+
+\innertext
+
+Level 3 closing text.
+\end{depththree}
+
+Level 2 closing text.
+\end{depthtwo}
+
+Level 1 closing text.
+\end{depthone}
+
+\caselead{Depth 4: no titles}
+\begin{depthone}
+Level 1 opening text.
+
+\begin{depthtwo}
+Level 2 opening text.
+
+\begin{depththree}
+Level 3 opening text.
+
+\begin{depthfour}
+Level 4 opening text.
+
+\innertext
+
+Level 4 closing text.
+\end{depthfour}
+
+Level 3 closing text.
+\end{depththree}
+
+Level 2 closing text.
+\end{depthtwo}
+
+Level 1 closing text.
+\end{depthone}
+
+\caselead{Depth 5: no titles}
+\begin{depthone}
+Level 1 opening text.
+
+\begin{depthtwo}
+Level 2 opening text.
+
+\begin{depththree}
+Level 3 opening text.
+
+\begin{depthfour}
+Level 4 opening text.
+
+\begin{depthfive}
+Level 5 opening text.
+
+\innertext
+
+Level 5 closing text.
+\end{depthfive}
+
+Level 4 closing text.
+\end{depthfour}
+
+Level 3 closing text.
+\end{depththree}
+
+Level 2 closing text.
+\end{depthtwo}
+
+Level 1 closing text.
+\end{depthone}
+
+\caselead{Depth 6: no titles}
+\begin{depthone}
+Level 1 opening text.
+
+\begin{depthtwo}
+Level 2 opening text.
+
+\begin{depththree}
+Level 3 opening text.
+
+\begin{depthfour}
+Level 4 opening text.
+
+\begin{depthfive}
+Level 5 opening text.
+
+\begin{depthsix}
+Level 6 opening text.
+
+\innertext
+
+Level 6 closing text.
+\end{depthsix}
+
+Level 5 closing text.
+\end{depthfive}
+
+Level 4 closing text.
+\end{depthfour}
+
+Level 3 closing text.
+\end{depththree}
+
+Level 2 closing text.
+\end{depthtwo}
+
+Level 1 closing text.
+\end{depthone}
+
+\end{document}

@@ -329,6 +329,7 @@ Nested behavior evidence:
 - `verification/nested-behavior/pdf/a4-nested-title-mix.pdf`
 - `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`
 - `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`
+- `verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf`
 
 Manual parity output is generated under `verification/manual-parity/` by the
 manual parity script. The manual check compiles `docs/tcolorbox/tcolorbox.tex`,
@@ -366,6 +367,7 @@ for the current run only.
   breakable behavior
 - `docs/tcolorbox/`: upstream documentation, standalone example sources, and assets used by parity checks
 - `docs/readme-demo/`: small A4 sample used for the README comparison image
+- `docs/samples/`: additional small samples, including titleless nested boxes
 - `verification/example-parity/`: generated parity report, source copies, and side-by-side PDFs
 - `verification/nested-behavior/`: generated nested-breakable behavior reports and PDFs
 - `verification/manual-parity/`: generated manual parity report, source copies, rendered pages, and side-by-side PDF

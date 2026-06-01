@@ -11,6 +11,7 @@
 | Title/no-title mixed continuations | `verification/nested-behavior/pdf/a4-nested-title-mix.pdf` |
 | Deep title/no-title mixed continuations | `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf` |
 | Nested breakable stress cases | `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf` |
+| Titleless nesting depths 2 through 6 | `verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf` |
 
 ## Checked Requirements
 
@@ -21,6 +22,7 @@
 | First fragments reach the same lower edge as the surrounding breakable frames, including four-level nesting. | `same-bottom ... ok` in `verification/nested-behavior/reports/nested-edge-alignment-report.txt` |
 | Title/no-title mixtures keep the intended clearance: title-adjacent cases get about 1 mm, titleless-to-titleless stays flush. | `title_mix_clearance=ok` in `verification/nested-behavior/reports/title-mix-clearance-report.txt` |
 | Stress cases cover midpage starts, no-title continuation, four-level nesting, and decorated upper/lower content. | `stress_markers=ok` in `verification/nested-behavior/reports/stress-report.txt` |
+| Fully titleless nesting is available for depths 2, 3, 4, 5, and 6. | Source: `docs/samples/titleless-nesting-depths.tex`; PDF: `verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf` |
 
 ## Key Measurements
 
