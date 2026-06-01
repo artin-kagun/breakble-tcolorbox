@@ -316,28 +316,70 @@ twice:
 The rendered pages are compared pixel-by-pixel, and side-by-side PDFs are
 generated with original output on the left and breakble output on the right.
 
-Standalone example report:
+### PDFs To Inspect
 
-- `verification/example-parity/report.md`
+To see concrete output, start with these PDFs. They are included in the
+repository.
+
+- `docs/readme-demo/nested-breakable-comparison.pdf`:
+  the README demo, with upstream `tcolorbox` on the left and
+  `breakble-tcolorbox` on the right.
+- `verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf`:
+  case-by-case comparison of nested `breakable` behavior.
+- `verification/nested-behavior/pdf/a4-nested-title-mix.pdf`:
+  title and no-title continuation mixtures, used to check spacing and overlap.
+- `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`:
+  deeper title and no-title continuation mixtures.
+- `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`:
+  stress cases covering mid-page starts, no-title continuation, multi-level
+  nesting, and decorated upper/lower content.
+- `verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf`:
+  titleless nesting at depths 2, 3, 4, 5, and 6.
+- `verification/nested-behavior/pdf/a4-titleless-reach-reference.pdf`:
+  a non-nested reference for how far ordinary `tcolorbox` content reaches
+  toward the page bottom.
+
+For upstream standalone examples, these PDFs put original output on the left
+and breakble output on the right:
+
 - `verification/example-parity/side-by-side/tcolorbox-example/tcolorbox-example__original-side-by-side.pdf`
 - `verification/example-parity/side-by-side/tcolorbox-example-poster/tcolorbox-example-poster__original-side-by-side.pdf`
 - `verification/example-parity/side-by-side/tcolorbox-tutorial-poster/tcolorbox-tutorial-poster__original-side-by-side.pdf`
 
-Nested behavior evidence:
+### Full Manual Check
+
+The upstream manual source is:
+
+- `docs/tcolorbox/tcolorbox.tex`
+
+That file includes the `docs/tcolorbox/tcolorbox.doc.*.tex` fragments. To
+compile the full manual with both upstream `tcolorbox` and this package, run:
+
+```sh
+scripts/check-upstream-manual-parity.py
+```
+
+After the script runs, the main outputs are:
+
+- breakble manual PDF:
+  `verification/manual-parity/sources/breakble/tcolorbox.pdf`
+- original manual PDF:
+  `verification/manual-parity/sources/original/tcolorbox.pdf`
+- side-by-side manual comparison PDF:
+  `verification/manual-parity/side-by-side/tcolorbox-manual/tcolorbox-side-by-side.pdf`
+- report:
+  `verification/manual-parity/report.md`
+
+`verification/manual-parity/` is ignored by Git because it contains generated
+manual PDFs and rendered page images. Run the script locally to regenerate it.
+
+Nested behavior report:
 
 - `verification/nested-behavior/report.md`
-- `verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf`
-  case-by-case original/breakble comparison
-- `verification/nested-behavior/pdf/a4-nested-title-mix.pdf`
-- `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`
-- `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`
-- `verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf`
-- `verification/nested-behavior/pdf/a4-titleless-reach-reference.pdf`
 
-Manual parity output is generated under `verification/manual-parity/` by the
-manual parity script. The manual check compiles `docs/tcolorbox/tcolorbox.tex`,
-including the documented `tcolorbox.doc.*.tex` fragments, and compares all
-rendered pages.
+Standalone example parity report:
+
+- `verification/example-parity/report.md`
 
 To regenerate standalone example parity:
 

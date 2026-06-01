@@ -276,25 +276,63 @@ upstream の standalone example と manual source を、それぞれ次の 2 通
 
 生成されたページを pixel 単位で比較し、左に元の出力、右に breakble 版を並べた比較 PDF も生成します。
 
-standalone example のレポート:
+### PDF で確認できるもの
 
-- `verification/example-parity/report.md`
+具体的な出力を見たい場合は、まず次の PDF を見てください。これらはリポジトリに含めてあります。
+
+- `docs/readme-demo/nested-breakable-comparison.pdf`:
+  README の説明に使っている基本の比較例です。左が元の `tcolorbox`、右が `breakble-tcolorbox` です。
+- `verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf`:
+  入れ子の `breakable` box が、元の `tcolorbox` と `breakble-tcolorbox` でどう違うかをケースごとに並べた比較 PDF です。
+- `verification/nested-behavior/pdf/a4-nested-title-mix.pdf`:
+  継続タイトルあり・なしが混ざる入れ子で、上下の余白や重なりが自然になるかを確認する PDF です。
+- `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`:
+  より深い入れ子で、継続タイトルあり・なしが混ざる場合を確認する PDF です。
+- `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`:
+  途中ページから始まる box、タイトルなしの継続、多重入れ子、装飾付きの上下部分などをまとめて確認する PDF です。
+- `verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf`:
+  タイトルなしの入れ子を 2, 3, 4, 5, 6 段で確認する PDF です。
+- `verification/nested-behavior/pdf/a4-titleless-reach-reference.pdf`:
+  入れ子なしの通常の `tcolorbox` がページ下部へどこまで到達するかを見るための基準 PDF です。
+
+upstream の standalone example については、左に元の出力、右に breakble 版を並べた比較 PDF があります。
+
 - `verification/example-parity/side-by-side/tcolorbox-example/tcolorbox-example__original-side-by-side.pdf`
 - `verification/example-parity/side-by-side/tcolorbox-example-poster/tcolorbox-example-poster__original-side-by-side.pdf`
 - `verification/example-parity/side-by-side/tcolorbox-tutorial-poster/tcolorbox-tutorial-poster__original-side-by-side.pdf`
 
-nested behavior の確認資料:
+### マニュアル全体で確認する場合
+
+upstream のマニュアル本文は、次のファイルです。
+
+- `docs/tcolorbox/tcolorbox.tex`
+
+このファイルから、`docs/tcolorbox/tcolorbox.doc.*.tex` の各断片が読み込まれます。改良版でマニュアル全体をコンパイルして確認する場合は、次を実行します。
+
+```sh
+scripts/check-upstream-manual-parity.py
+```
+
+実行後、主な出力は次の場所にできます。
+
+- 改良版でコンパイルしたマニュアル:
+  `verification/manual-parity/sources/breakble/tcolorbox.pdf`
+- 元の `tcolorbox` でコンパイルしたマニュアル:
+  `verification/manual-parity/sources/original/tcolorbox.pdf`
+- 左に元の出力、右に breakble 版を並べたマニュアル比較 PDF:
+  `verification/manual-parity/side-by-side/tcolorbox-manual/tcolorbox-side-by-side.pdf`
+- 実行結果のレポート:
+  `verification/manual-parity/report.md`
+
+`verification/manual-parity/` は、マニュアル全体の PDF やレンダリング画像を含む生成物なので、Git では無視しています。手元で上のスクリプトを実行すると再生成されます。
+
+nested behavior のレポート:
 
 - `verification/nested-behavior/report.md`
-- `verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf`
-  ケースごとに元の tcolorbox と breakble 版を並べた比較 PDF
-- `verification/nested-behavior/pdf/a4-nested-title-mix.pdf`
-- `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`
-- `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`
-- `verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf`
-- `verification/nested-behavior/pdf/a4-titleless-reach-reference.pdf`
 
-manual parity の出力は、manual parity script によって `verification/manual-parity/` 以下に生成されます。この検証では `docs/tcolorbox/tcolorbox.tex` をコンパイルし、そこから読み込まれる `tcolorbox.doc.*.tex` 断片を含めて、全ページを比較します。
+standalone example parity のレポート:
+
+- `verification/example-parity/report.md`
 
 standalone example parity の再生成:
 
