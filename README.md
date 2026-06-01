@@ -5,9 +5,9 @@
 `breakble-tcolorbox` is an unofficial modified distribution of
 [`tcolorbox`](https://github.com/T-F-S/tcolorbox) 6.10.0.
 
-It keeps the public `tcolorbox` interface, but changes one narrow behavior:
-ordinary nested `breakable` boxes can break when their immediate parent
-`tcolorbox` is also `breakable`.
+It keeps the public `tcolorbox` interface while improving page breaking for
+ordinary nested `breakable` boxes whose immediate parent `tcolorbox` is also
+`breakable`.
 
 The intended result is:
 
@@ -60,12 +60,12 @@ current page, it may be moved to the next page, leaving a large blank area.
 With `breakble-tcolorbox`, the nested box is split into fragments managed by the
 parent breakable box, so the first fragment can start in the remaining space.
 
-The following comparison uses the same A4 document. The only meaningful
-difference is the package being loaded: upstream `tcolorbox` on the left,
-`breakble-tcolorbox` on the right. Page 1 shows the actual problem: upstream
-leaves the page remainder blank, while the breakble version starts the nested
-box immediately. Page 2 shows that the nested box really continued across the
-page break.
+The following comparison uses the same A4 document. The document body is the
+same; the package load is what changes for the comparison: upstream
+`tcolorbox` on the left, `breakble-tcolorbox` on the right. Page 1 shows the
+actual problem: upstream leaves the page remainder blank, while the breakble
+version starts the nested box immediately. Page 2 shows that the nested box
+really continued across the page break.
 
 ![Nested breakable comparison page 1](docs/readme-demo/images/nested-breakable-comparison-page-000001.png)
 
@@ -140,9 +140,10 @@ The directory below is also required at compile time:
 That `tcolorbox/` directory is a modified copy of upstream runtime files. It
 contains `tcolorbox.sty`, library files such as `tcbbreakable.code.tex` and
 `tcbskins.code.tex`, and image assets used by some skins. It is not a separate
-package that you load by hand, and it should not be copied only partially.
+package that you load by hand, and it should be kept together with
+`breakble-tcolorbox.sty`.
 
-In a document, load only:
+In a document, load:
 
 ```tex
 \usepackage[most]{breakble-tcolorbox}
@@ -152,7 +153,8 @@ Do not load `tcolorbox/` directly. The wrapper loads the modified runtime files.
 
 ## Project-Local Installation
 
-This is the safest way to try the package because it affects only one project.
+This is the most convenient way to try the package because it is scoped to one
+project.
 
 Keep this repository somewhere on disk, then compile your document with this
 repository at the front of TeX's input path:
@@ -248,9 +250,8 @@ sudo cp -R tcolorbox "$TEXMFLOCAL/tex/latex/breakble-tcolorbox/"
 sudo mktexlsr
 ```
 
-Use a site-wide install only if you are comfortable with this modified
-`tcolorbox` being found before the upstream copy for documents compiled in that
-TeX installation.
+Choose a site-wide install when you want this modified `tcolorbox` to be found
+before the upstream copy for documents compiled in that TeX installation.
 
 ## If Another Package Loads `tcolorbox`
 
@@ -358,7 +359,7 @@ scripts/run-full-verification.sh
 
 The scripts expect `latexmk`, `pdflatex`, `biber`, `makeindex`, `pdfinfo`, and
 `pdftopng`. If `pygmentize` is not on `PATH`, they install Pygments into `/tmp`
-for the current run only.
+for the current run.
 
 ## Repository Layout
 
@@ -368,8 +369,8 @@ for the current run only.
 - `docs/nested-breakable-requirements.md`: development requirements for nested
   breakable behavior
 - `docs/tcolorbox/`: upstream documentation, standalone example sources, and assets used by parity checks
-- `docs/readme-demo/`: small A4 sample used for the README comparison image
-- `docs/samples/`: additional small samples, including titleless nested boxes
+- `docs/readme-demo/`: A4 sample used for the README comparison image
+- `docs/samples/`: additional samples, including titleless nested boxes
 - `verification/example-parity/`: generated parity report, source copies, and side-by-side PDFs
 - `verification/nested-behavior/`: generated nested-breakable behavior reports and PDFs
 - `verification/manual-parity/`: generated manual parity report, source copies, rendered pages, and side-by-side PDF
