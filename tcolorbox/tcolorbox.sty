@@ -1501,6 +1501,8 @@
 \def\tcb@layer@containsnestedtitle@false{false}
 \def\tcb@layer@continuedtitle@true{true}
 \def\tcb@layer@continuedtitle@false{false}
+\def\tcb@layer@hastitle@true{true}
+\def\tcb@layer@hastitle@false{false}
 \def\tcb@nested@managedbreakable@true{true}
 \def\tcb@nested@managedbreakable@false{false}
 \let\tcb@nested@managedbreakable\tcb@nested@managedbreakable@false
@@ -1543,6 +1545,14 @@
     \expandafter\global\expandafter\let\csname tcb@layer@continuedtitle@\romannumeral\c@tcblayer\endcsname\tcb@layer@continuedtitle@false%
   \else%
     \expandafter\global\expandafter\let\csname tcb@layer@continuedtitle@\romannumeral\c@tcblayer\endcsname\tcb@layer@continuedtitle@true%
+  \fi%
+}
+
+\def\tcb@store@layer@hastitle{%
+  \ifx\kvtcb@title\@empty%
+    \expandafter\global\expandafter\let\csname tcb@layer@hastitle@\romannumeral\c@tcblayer\endcsname\tcb@layer@hastitle@false%
+  \else%
+    \expandafter\global\expandafter\let\csname tcb@layer@hastitle@\romannumeral\c@tcblayer\endcsname\tcb@layer@hastitle@true%
   \fi%
 }
 
@@ -1601,9 +1611,23 @@
   \else%
     \@tempdimb=\z@%
   \fi%
-  \@tempdima=\dimexpr
-    \@tempdimb+\kvtcb@top@rule@stand+\kvtcb@bottom@rule@break
-    +\kvtcb@boxsep*2+\kvtcb@top+\kvtcb@bottom+\tcb@layer@reserve@bottomsep\relax%
+  \@tempswatrue%
+  \ifx\kvtcb@title\@empty%
+    \@tempswafalse%
+    \ifnum\c@tcblayer>1\relax%
+      \expandafter\ifx\csname tcb@layer@hastitle@\romannumeral\numexpr\c@tcblayer-1\relax\endcsname\tcb@layer@hastitle@true%
+        \@tempswatrue%
+      \fi%
+    \fi%
+  \fi%
+  \if@tempswa%
+    \@tempdima=\dimexpr
+      \@tempdimb+\kvtcb@top@rule@stand+\kvtcb@bottom@rule@break
+      +\kvtcb@boxsep*2+\kvtcb@top+\kvtcb@bottom+\tcb@layer@reserve@bottomsep\relax%
+  \else%
+    \@tempdima=\dimexpr
+      \kvtcb@bottom@rule@break+\kvtcb@bottom/2+\tcb@layer@reserve@bottomsep\relax%
+  \fi%
   \expandafter\xdef\csname tcb@layer@breakreserve@\romannumeral\c@tcblayer\endcsname{\the\@tempdima}%
   \endgroup%
 }
@@ -1694,6 +1718,7 @@
   \tcb@store@layer@breakable%
   \tcb@reset@layer@containsnested%
   \tcb@store@layer@continuedtitle%
+  \tcb@store@layer@hastitle%
   \tcb@mark@ancestor@nested@breakable%
   \tcb@mark@parent@nested@continuedtitle%
   \tcb@store@layer@pageheight%

@@ -1,0 +1,53 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[margin=22mm]{geometry}
+\usepackage{lipsum}
+\usepackage[most]{breakble-tcolorbox}
+
+\pagestyle{plain}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+
+\tcbset{
+  titleless reference box/.style={
+    enhanced,
+    breakable,
+    boxrule=0.55pt,
+    arc=1.2mm,
+    outer arc=1.2mm,
+    left=2.2mm,
+    right=2.2mm,
+    top=1.8mm,
+    bottom=1.8mm,
+    before skip=2.5mm,
+    after skip=2.5mm,
+    colframe=blue!75!black,
+    colback=blue!3!white,
+  },
+}
+
+\newtcolorbox{referencebox}{titleless reference box}
+
+\newcommand{\innertext}{%
+  \lipsum[1-5]
+  \medskip
+  \lipsum[6-9]
+}
+
+\begin{document}
+
+{\Large\bfseries Reference: no nesting, no title\par}
+\medskip
+This is the baseline for page-bottom reach. The box is a normal non-nested
+breakable tcolorbox without a title option, using the same vertical padding,
+rules, and prose as the titleless nesting-depth sample.
+\medskip
+
+\begin{referencebox}
+Reference opening text.
+
+\innertext
+
+Reference closing text.
+\end{referencebox}
+
+\end{document}

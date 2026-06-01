@@ -1,0 +1,5 @@
+pdf=verification/nested-behavior/pdf/a4-titleless-reach-reference.pdf
+page_height_pt=841.89
+page content_bottom_y_px bottom_gap_to_textarea_px approx_gap_pt
+1 774 5 5.00
+2 231 548 548.00

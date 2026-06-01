@@ -291,6 +291,7 @@ nested behavior の確認資料:
 - `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`
 - `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`
 - `verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf`
+- `verification/nested-behavior/pdf/a4-titleless-reach-reference.pdf`
 
 manual parity の出力は、manual parity script によって `verification/manual-parity/` 以下に生成されます。この検証では `docs/tcolorbox/tcolorbox.tex` をコンパイルし、そこから読み込まれる `tcolorbox.doc.*.tex` 断片を含めて、全ページを比較します。
 

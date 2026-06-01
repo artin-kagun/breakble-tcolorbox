@@ -337,16 +337,25 @@
 
 \def\tcb@nested@effective@breakreserve{%
   \@tempdima=\z@%
+  \@tempdimc=\z@%
   \@tempcnta=1\relax%
-  \@tempcntb=\numexpr\c@tcblayer-1\relax%
+  \@tempcntb=\z@%
   \@whilenum\@tempcnta<\c@tcblayer\do{%
     \expandafter\ifx\csname tcb@layer@breakreserve@\romannumeral\@tempcnta\endcsname\relax%
     \else%
       \@tempdimb=\csname tcb@layer@breakreserve@\romannumeral\@tempcnta\endcsname\relax%
       \advance\@tempdima by \@tempdimb%
+      \expandafter\ifx\csname tcb@layer@hastitle@\romannumeral\@tempcnta\endcsname\tcb@layer@hastitle@true%
+        \@tempcntb=1\relax%
+      \else%
+        \@tempdimc=\@tempdimb%
+      \fi%
     \fi%
     \advance\@tempcnta by 1\relax%
   }%
+  \ifnum\@tempcntb=0\relax%
+    \@tempdima=\@tempdimc%
+  \fi%
 }
 
 \def\tcb@nested@current@pageheight{%

@@ -330,6 +330,7 @@ Nested behavior evidence:
 - `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`
 - `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`
 - `verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf`
+- `verification/nested-behavior/pdf/a4-titleless-reach-reference.pdf`
 
 Manual parity output is generated under `verification/manual-parity/` by the
 manual parity script. The manual check compiles `docs/tcolorbox/tcolorbox.tex`,
