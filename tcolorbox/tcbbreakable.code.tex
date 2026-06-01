@@ -246,6 +246,28 @@
 \def\tcb@nested@continuedtitle@belowgap{1.5mm}
 \def\tcb@nested@titleless@totitlegap{1.05mm}
 \def\tcb@nested@titleless@betweentitlesgap{1.05mm}
+\def\tcb@nested@titleless@afterbreakgap{1mm}
+
+\def\tcb@nested@add@titleless@afterbreakgap{%
+  \tcb@if@nested@managedbreakable{%
+    \tcb@if@contains@nested@breakable{}{%
+      \ifx\kvtcb@followingtitle\@empty\relax%
+        \tcbdimto\tcb@break@topsep{\tcb@break@topsep+\tcb@nested@titleless@afterbreakgap}%
+      \fi%
+    }%
+  }{}%
+}
+
+\def\tcb@nested@add@titleless@breaksepgap{%
+  \tcb@if@nested@managedbreakable{%
+    \tcb@if@contains@nested@breakable{}{%
+      \ifx\kvtcb@followingtitle\@empty\relax%
+        \tcbdimto\tcb@h@breaksep@middle{\tcb@h@breaksep@middle+\tcb@nested@titleless@afterbreakgap}%
+        \tcbdimto\tcb@h@breaksep@last{\tcb@h@breaksep@last+\tcb@nested@titleless@afterbreakgap}%
+      \fi%
+    }%
+  }{}%
+}
 
 \def\tcb@nested@preserve@continuedtitlegaps{%
   \ifx\kvtcb@followingtitle\@empty\relax%
@@ -332,6 +354,13 @@
     \@tempdimb=\tcb@h@page\relax%
   \else%
     \@tempdimb=\csname tcb@layer@pageheight@\romannumeral\c@tcblayer\endcsname\relax%
+  \fi%
+  \ifnum\c@tcblayer=2\relax%
+    \ifdim\tcb@h@page<.85\textheight\relax%
+      \ifdim\@tempdimb<\tcb@h@page\relax%
+        \@tempdimb=\tcb@h@page\relax%
+      \fi%
+    \fi%
   \fi%
 }
 
@@ -675,6 +704,7 @@
   \let\kvtcb@bbtop=\kvtcb@bbtop@break%
   \let\kvtcb@bbbottom=\kvtcb@bbbottom@break%
   \let\tcb@break@topsep=\kvtcb@topsep%
+  \tcb@nested@add@titleless@afterbreakgap%
   \let\tcb@break@bottomsep=\kvtcb@bottomsep%
 }
 
@@ -685,6 +715,7 @@
   \let\kvtcb@bbtop=\kvtcb@bbtop@break%
   \let\kvtcb@bbbottom=\kvtcb@bbbottom@stand%
   \let\tcb@break@topsep=\kvtcb@topsep%
+  \tcb@nested@add@titleless@afterbreakgap%
   \let\tcb@break@bottomsep=\tcb@zpt%
 }
 
@@ -745,6 +776,7 @@
   \let\tcb@h@breaksep@first=\kvtcb@bottomsep%
   \tcbdimto\tcb@h@breaksep@middle{\kvtcb@bottomsep+\kvtcb@topsep}%
   \let\tcb@h@breaksep@last=\kvtcb@topsep%
+  \tcb@nested@add@titleless@breaksepgap%
   \tcbdimto\tcb@h@padding@first{\kvtcb@bbtop@stand+\kvtcb@bbbottom@break+\kvtcb@top@rule@stand+\kvtcb@bottom@rule@break+\tcb@h@breaksep@first+\kvtcb@boxsep*2+\kvtcb@top+\kvtcb@bottom}%
   \tcbdimto\tcb@h@padding@middle{\kvtcb@bbtop@break+\kvtcb@bbbottom@break+\kvtcb@top@rule@break+\kvtcb@bottom@rule@break+\tcb@h@breaksep@middle+\kvtcb@boxsep*2+\kvtcb@top+\kvtcb@bottom}%
   \tcbdimto\tcb@h@padding@last{\kvtcb@bbtop@break+\kvtcb@bbbottom@stand+\kvtcb@top@rule@break+\kvtcb@bottom@rule@stand+\tcb@h@breaksep@last+\kvtcb@boxsep*2+\kvtcb@top+\kvtcb@bottom}%

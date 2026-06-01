@@ -1,0 +1,10 @@
+pdf=build/compare/patched/a4-nested-behavior/a4-nested-behavior.pdf
+nested_behavior=ok
+first_fragment_gap_limit_pt=70
+heading marker heading_page marker_page gap_pt same_page reach_ok reason
+'Plain nested: one level, no continuation title' CMP-ONE-FIRST 4 4 14.00 ok ok one-level ordinary prose should start in the same page fragment
+'Plain nested: two levels, no continuation title' CMP-TWO-FIRST 6 6 45.00 ok ok two-level ordinary prose should start in the same page fragment
+'Plain nested: four levels, no continuation title' CMP-FOUR-FIRST 8 8 52.00 ok ok four-level ordinary prose should not be pushed to the next page
+'Midpage nested start: ordinary prose' CMP-MIDPAGE-FIRST 10 10 66.00 ok ok midpage inner prose should use the current page remainder
+'Nested titles: title but no continued title' CMP-TITLED-FIRST 12 12 24.00 ok ok a titled inner box without title-after-break should start in place
+'Nested break hooks: first middle last' CMP-HOOK-FIRST 14 14 41.00 ok ok first/middle/last hook case should start in place

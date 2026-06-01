@@ -1,0 +1,43 @@
+pdf=build/compare/patched/a4-nested-behavior/a4-nested-behavior.pdf
+nested_edge_alignment=ok
+reference_continuation_page=3 reference_top_pt=62.50 reference_body_top_pt=72.00 reference_pixels=6063
+edge marker page parent_color inner_color inset_pt limit_pt result parent_pixels inner_pixels reason
+bottom CMP-ONE-FIRST 4 blue green 0.00 18.00 ok 36187 7990 one-level inner first fragment bottom
+bottom CMP-TWO-FIRST 6 green orange 0.00 18.00 ok 7795 7406 two-level deep first fragment bottom
+bottom CMP-FOUR-FIRST 8 red purple 0.00 32.00 ok 20415 7229 four-level core first fragment bottom
+bottom CMP-MIDPAGE-FIRST 10 blue green -0.50 18.00 ok 38868 8137 midpage inner first fragment bottom
+bottom CMP-TITLED-FIRST 12 blue green 0.00 18.00 ok 36082 32865 titled inner first fragment bottom
+bottom CMP-HOOK-FIRST 14 blue green 0.00 18.00 ok 35884 33577 hook first fragment bottom
+top CMP-HOOK-MIDDLE 15 blue orange 3.00 55.00 ok 8346 39819 hook middle continuation top
+top-after CMP-ONE-FIRST 5 blue green 0.00 22.00 ok 6931 5645 one-level inner first continuation top
+top-after CMP-TWO-FIRST 7 green orange -0.50 22.00 ok 6266 6683 two-level deep first continuation top
+top-after CMP-FOUR-FIRST 9 red purple 0.00 36.00 ok 19100 6102 four-level core first continuation top
+top-after CMP-MIDPAGE-FIRST 11 blue green 0.00 22.00 ok 5278 3971 midpage inner first continuation top
+top-after CMP-TITLED-FIRST 13 blue green 0.00 40.00 ok 4076 4572 titled inner first continuation top
+absolute marker page color delta_pt limit_pt result pixels reason
+absolute-top-after CMP-ONE-FIRST 5 blue 0.00 6.00 ok 6931 one-level outer continuation should start at the reference top
+absolute-top-after CMP-TWO-FIRST 7 blue 0.00 6.00 ok 7553 two-level outer continuation should start at the reference top
+absolute-top-after CMP-FOUR-FIRST 9 blue 0.00 6.00 ok 8496 four-level outer continuation should start at the reference top
+absolute-top-after CMP-MIDPAGE-FIRST 11 blue 0.00 6.00 ok 5278 midpage outer continuation should start at the reference top
+absolute-top-after CMP-TITLED-FIRST 13 blue 0.00 6.00 ok 4076 titled outer continuation should start at the reference top
+absolute-top-after CMP-HOOK-FIRST 15 blue 0.00 6.00 ok 8346 hook outer continuation should start at the reference top
+absolute-top CMP-HOOK-MIDDLE 15 blue 0.00 6.00 ok 8346 hook middle page should start at the reference top
+body-top-after CMP-ONE-FIRST 5 black 3.00 45.00 ok 0 one-level continuation body should not be vertically delayed
+body-top-after CMP-TWO-FIRST 7 black 3.00 45.00 ok 0 two-level continuation body should not be vertically delayed
+body-top-after CMP-FOUR-FIRST 9 black 3.00 45.00 ok 0 four-level continuation body should not be vertically delayed
+body-top-after CMP-MIDPAGE-FIRST 11 black 3.00 45.00 ok 0 midpage continuation body should not be vertically delayed
+body-top-after CMP-TITLED-FIRST 13 black 3.00 45.00 ok 0 titled continuation body should not be vertically delayed
+body-top-after CMP-HOOK-FIRST 15 black 21.50 45.00 ok 0 hook continuation body should not be vertically delayed
+same-edge marker page colors span_pt limit_pt result measurements reason
+same-top-after CMP-ONE-FIRST 5 blue,green 0.00 3.00 ok blue:62.50pt:6931;green:62.50pt:5645 one-level continuation frame tops
+same-top-after CMP-TWO-FIRST 7 blue,green,orange 0.50 3.00 ok blue:62.50pt:7553;green:62.50pt:6266;orange:62.00pt:6683 two-level continuation frame tops
+same-top-after CMP-FOUR-FIRST 9 blue,green,orange,red,purple 0.50 3.00 ok blue:62.50pt:8496;green:62.50pt:8072;orange:62.00pt:7649;red:62.50pt:19100;purple:62.50pt:6102 four-level continuation frame tops
+same-top-after CMP-MIDPAGE-FIRST 11 blue,green 0.00 3.00 ok blue:62.50pt:5278;green:62.50pt:3971 midpage continuation frame tops
+same-top-after CMP-TITLED-FIRST 13 blue,green 0.00 3.00 ok blue:62.50pt:4076;green:62.50pt:4572 titled continuation frame tops
+same-top-after CMP-HOOK-FIRST 15 blue,orange 3.00 3.00 ok blue:62.50pt:8346;orange:65.50pt:39819 hook continuation frame tops
+same-bottom CMP-ONE-FIRST 4 blue,green 0.00 3.00 ok blue:765.50pt:36187;green:765.50pt:7990 one-level first-fragment frame bottoms
+same-bottom CMP-TWO-FIRST 6 blue,green,orange 0.00 3.00 ok blue:734.00pt:35809;green:734.00pt:7795;orange:734.00pt:7406 two-level first-fragment frame bottoms
+same-bottom CMP-FOUR-FIRST 8 blue,green,orange,red,purple 0.50 3.00 ok blue:726.50pt:35719;green:726.50pt:7721;orange:727.00pt:7334;red:727.00pt:20415;purple:727.00pt:7229 four-level first-fragment frame bottoms
+same-bottom CMP-MIDPAGE-FIRST 10 blue,green 0.50 3.00 ok blue:713.00pt:38868;green:713.50pt:8137 midpage first-fragment frame bottoms
+same-bottom CMP-TITLED-FIRST 12 blue,green 0.00 3.00 ok blue:754.50pt:36082;green:754.50pt:32865 titled first-fragment frame bottoms
+same-bottom CMP-HOOK-FIRST 14 blue,green 0.00 3.00 ok blue:738.00pt:35884;green:738.00pt:33577 hook first-fragment frame bottoms

@@ -62,15 +62,44 @@ parent breakable box, so the first fragment can start in the remaining space.
 
 The following comparison uses the same A4 document. The only meaningful
 difference is the package being loaded: upstream `tcolorbox` on the left,
-`breakble-tcolorbox` on the right.
+`breakble-tcolorbox` on the right. Page 1 shows the actual problem: upstream
+leaves the page remainder blank, while the breakble version starts the nested
+box immediately. Page 2 shows that the nested box really continued across the
+page break.
 
-![Nested breakable comparison](docs/readme-demo/images/nested-breakable-comparison.png)
+![Nested breakable comparison page 1](docs/readme-demo/images/nested-breakable-comparison-page-000001.png)
+
+![Nested breakable comparison page 2](docs/readme-demo/images/nested-breakable-comparison-page-000002.png)
+
+The same comparison is also available as a PDF:
+
+- `docs/readme-demo/nested-breakable-comparison.pdf`
+
+The core of the sample is ordinary `tcolorbox` code:
+
+```tex
+\begin{outerdemo}
+Text before the nested box.
+
+\begin{innerdemo}
+Nested breakable content begins here.
+
+% Long ordinary prose follows.
+% In upstream tcolorbox this nested box is moved to the next page.
+% In breakble-tcolorbox it starts here and continues on the next page.
+\end{innerdemo}
+
+Text after the nested box.
+\end{outerdemo}
+```
 
 The full sample sources are in `docs/readme-demo/`:
 
 - `nested-breakable-original.tex`: uses upstream `tcolorbox`
 - `nested-breakable-breakble.tex`: uses `breakble-tcolorbox`
 - `nested-breakable-body.tex`: shared document body
+- `nested-breakable-comparison.pdf`: side-by-side output, original left and
+  breakble right
 
 In the breakble version, the document starts with:
 
@@ -274,6 +303,9 @@ This avoids most option-clash situations because `most` loads the usual
 
 ## Verification
 
+The nested-breakable requirements used for development are recorded in
+`docs/nested-breakable-requirements.md`.
+
 The upstream standalone examples and the upstream manual source are compiled
 twice:
 
@@ -289,6 +321,14 @@ Standalone example report:
 - `verification/example-parity/side-by-side/tcolorbox-example/tcolorbox-example__original-side-by-side.pdf`
 - `verification/example-parity/side-by-side/tcolorbox-example-poster/tcolorbox-example-poster__original-side-by-side.pdf`
 - `verification/example-parity/side-by-side/tcolorbox-tutorial-poster/tcolorbox-tutorial-poster__original-side-by-side.pdf`
+
+Nested behavior evidence:
+
+- `verification/nested-behavior/report.md`
+- `verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf`
+- `verification/nested-behavior/pdf/a4-nested-title-mix.pdf`
+- `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`
+- `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`
 
 Manual parity output is generated under `verification/manual-parity/` by the
 manual parity script. The manual check compiles `docs/tcolorbox/tcolorbox.tex`,
@@ -322,9 +362,12 @@ for the current run only.
 - `breakble-tcolorbox.sty`: public wrapper package
 - `tcolorbox/`: modified runtime package files used by the wrapper
 - `vendor/tcolorbox-original/`: unmodified upstream runtime files used for parity checks
+- `docs/nested-breakable-requirements.md`: development requirements for nested
+  breakable behavior
 - `docs/tcolorbox/`: upstream documentation, standalone example sources, and assets used by parity checks
 - `docs/readme-demo/`: small A4 sample used for the README comparison image
 - `verification/example-parity/`: generated parity report, source copies, and side-by-side PDFs
+- `verification/nested-behavior/`: generated nested-breakable behavior reports and PDFs
 - `verification/manual-parity/`: generated manual parity report, source copies, rendered pages, and side-by-side PDF
 
 ## Upstream

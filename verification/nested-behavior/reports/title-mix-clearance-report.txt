@@ -1,0 +1,9 @@
+pdf=build/compare/patched/a4-nested-title-mix-deep/a4-nested-title-mix-deep.pdf
+title_mix_clearance=ok
+measurement gap_mm target_mm tolerance_mm
+case-f-title-to-titleless 1.016 1.000 0.250
+case-f-titleless-to-title 1.016 1.000 0.250
+case-f-title-to-titleless-inner 1.016 1.000 0.250
+case-h-title-to-titleless 1.016 1.000 0.250
+case-h-titleless-to-titleless -0.042 0.000 0.250
+case-h-titleless-to-title 1.016 1.000 0.250

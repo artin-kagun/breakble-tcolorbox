@@ -1,0 +1,19 @@
+pdf=build/compare/patched/a4-nested-breakable-stress/a4-nested-breakable-stress.pdf
+reference_page=2
+reference_gap_pt=5.00
+stress_markers=ok
+STRESS-REF-CONTINUED: pages 3
+STRESS-MIDPAGE-CONTINUED: pages 5
+STRESS-FOUR-CONTINUED: pages 11
+STRESS-NOTITLE-FIRST: pages 12
+STRESS-NOTITLE-CONTINUED: pages 13
+STRESS-LOWER-CONTINUED: pages 15
+STRESS-LOWER-SEGCHECK: pages 14
+label page gap_pt extra_vs_reference_pt limit_pt result reason
+reference 2 5.00 0.00 25.00 ok stress non-nested reference first fragment
+midpage 4 50.00 45.00 65.00 ok nested first fragment after normal text
+plain 6 20.00 15.00 65.00 ok nested continuation without title-after-break
+plain-notitle 8 17.00 12.00 65.00 ok notitle nested continuation
+four-level 10 43.00 38.00 65.00 ok four-level nested first fragment
+no-title 12 22.00 17.00 65.00 ok no-title nested first fragment
+upper-lower 14 37.00 32.00 65.00 ok decorated upper/lower nested first fragment

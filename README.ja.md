@@ -52,13 +52,40 @@
 
 下の比較は、同じ A4 文書をコンパイルしたものです。左が元の `tcolorbox`、右が `breakble-tcolorbox` です。意味のある違いは、読み込むパッケージだけです。
 
-![Nested breakable comparison](docs/readme-demo/images/nested-breakable-comparison.png)
+1ページ目では、元の `tcolorbox` がページ下部を大きく空けて内側の box を次ページへ送っている一方で、`breakble-tcolorbox` は同じページの残り領域から内側の box を始めています。2ページ目を見ると、右側の内側 box が実際にページをまたいで続いていることが分かります。
+
+![Nested breakable comparison page 1](docs/readme-demo/images/nested-breakable-comparison-page-000001.png)
+
+![Nested breakable comparison page 2](docs/readme-demo/images/nested-breakable-comparison-page-000002.png)
+
+同じ比較は PDF でも確認できます。
+
+- `docs/readme-demo/nested-breakable-comparison.pdf`
+
+サンプルの中心部分は、普通の `tcolorbox` の書き方です。
+
+```tex
+\begin{outerdemo}
+Text before the nested box.
+
+\begin{innerdemo}
+Nested breakable content begins here.
+
+% Long ordinary prose follows.
+% 元の tcolorbox では、この内側 box が次ページへ送られます。
+% breakble-tcolorbox では、ここから始まり、次ページへ続きます。
+\end{innerdemo}
+
+Text after the nested box.
+\end{outerdemo}
+```
 
 このサンプルのソースは `docs/readme-demo/` に置いてあります。
 
 - `nested-breakable-original.tex`: 元の `tcolorbox` を使う版
 - `nested-breakable-breakble.tex`: `breakble-tcolorbox` を使う版
 - `nested-breakable-body.tex`: 両者で共通の本文
+- `nested-breakable-comparison.pdf`: 左に元の出力、右に `breakble-tcolorbox` の出力を並べた PDF
 
 `breakble-tcolorbox` 版の冒頭は次のようになっています。
 
@@ -240,6 +267,8 @@ TEXINPUTS="/path/to/breakble-tcolorbox/tcolorbox//:" kpsewhich tcolorbox.sty
 
 ## 検証
 
+開発中に固めた nested breakable の要件は `docs/nested-breakable-requirements.md` に残しています。
+
 upstream の standalone example と upstream manual source を、それぞれ次の 2 通りでコンパイルします。
 
 - original `tcolorbox` 6.10.0
@@ -253,6 +282,14 @@ standalone example のレポート:
 - `verification/example-parity/side-by-side/tcolorbox-example/tcolorbox-example__original-side-by-side.pdf`
 - `verification/example-parity/side-by-side/tcolorbox-example-poster/tcolorbox-example-poster__original-side-by-side.pdf`
 - `verification/example-parity/side-by-side/tcolorbox-tutorial-poster/tcolorbox-tutorial-poster__original-side-by-side.pdf`
+
+nested behavior の確認資料:
+
+- `verification/nested-behavior/report.md`
+- `verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf`
+- `verification/nested-behavior/pdf/a4-nested-title-mix.pdf`
+- `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`
+- `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`
 
 manual parity の出力は、manual parity script によって `verification/manual-parity/` 以下に生成されます。この検証では `docs/tcolorbox/tcolorbox.tex` をコンパイルし、そこから読み込まれる `tcolorbox.doc.*.tex` 断片を含めて、全ページを比較します。
 
@@ -281,9 +318,11 @@ scripts/run-full-verification.sh
 - `breakble-tcolorbox.sty`: 文書から読み込む公開用 wrapper package
 - `tcolorbox/`: wrapper が読み込む改変済み runtime package files
 - `vendor/tcolorbox-original/`: parity check 用の未改変 upstream runtime files
+- `docs/nested-breakable-requirements.md`: nested breakable 挙動について開発中に固めた要件
 - `docs/tcolorbox/`: parity check に使う upstream documentation、standalone example sources、assets
 - `docs/readme-demo/`: README の比較画像に使う小さな A4 サンプル
 - `verification/example-parity/`: 生成済み parity report、source copies、side-by-side PDFs
+- `verification/nested-behavior/`: nested breakable の確認用レポートとPDF
 - `verification/manual-parity/`: 生成される manual parity report、source copies、rendered pages、side-by-side PDF
 
 ## Upstream
