@@ -29,4 +29,5 @@ Changed or added files:
 Files copied unchanged from upstream are kept under `vendor/tcolorbox-original/`
 for verification.
 
-Generated verification artifacts are in `verification/example-parity/`.
+Generated verification artifacts are in `verification/example-parity/` and
+`verification/manual-parity/`.

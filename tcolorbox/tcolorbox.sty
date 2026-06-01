@@ -1591,6 +1591,11 @@
 
 \def\tcb@store@layer@breakreserve{%
   \begingroup%
+  \ifdefined\kvtcb@bottomsep%
+    \let\tcb@layer@reserve@bottomsep\kvtcb@bottomsep%
+  \else%
+    \let\tcb@layer@reserve@bottomsep\tcb@zpt%
+  \fi%
   \iftcb@hasTitle%
     \@tempdimb=\dimexpr\kvtcb@title@rule+\kvtcb@boxsep*2+\kvtcb@toptitle+\kvtcb@bottomtitle+\ht\tcb@titlebox+\dp\tcb@titlebox\relax%
   \else%
@@ -1598,7 +1603,7 @@
   \fi%
   \@tempdima=\dimexpr
     \@tempdimb+\kvtcb@top@rule@stand+\kvtcb@bottom@rule@break
-    +\kvtcb@boxsep*2+\kvtcb@top+\kvtcb@bottom+\kvtcb@bottomsep\relax%
+    +\kvtcb@boxsep*2+\kvtcb@top+\kvtcb@bottom+\tcb@layer@reserve@bottomsep\relax%
   \expandafter\xdef\csname tcb@layer@breakreserve@\romannumeral\c@tcblayer\endcsname{\the\@tempdima}%
   \endgroup%
 }

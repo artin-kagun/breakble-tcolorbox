@@ -1,0 +1,108 @@
+\pagestyle{plain}
+\setlength{\parindent}{0pt}
+
+\newtcolorbox{outerdemo}{
+  enhanced,
+  breakable,
+  colback=blue!3!white,
+  colframe=blue!65!black,
+  title=Outer breakable box,
+  fonttitle=\bfseries,
+  boxrule=0.6pt,
+}
+
+\newtcolorbox{innerdemo}{
+  enhanced,
+  breakable,
+  colback=green!4!white,
+  colframe=green!45!black,
+  title=Nested breakable box,
+  fonttitle=\bfseries,
+  boxrule=0.6pt,
+}
+
+\begin{document}
+
+\section*{Nested breakable example}
+
+This short lead-in text puts the outer box part way down the page, as often
+happens in ordinary documents. The important point is that the nested box should
+be able to use the remaining space on this page instead of being pushed to the
+next page as one large unbreakable object.
+
+\medskip
+
+Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia
+Curae; Integer a sem vel erat dignissim porta. Morbi non nibh at lectus
+fermentum posuere. Sed vitae nibh vel tortor finibus dignissim.
+
+\medskip
+
+Aliquam vel massa sit amet nisl bibendum volutpat. Donec id neque eu justo
+fringilla interdum. Cras non urna vel sem luctus tempor. Praesent finibus
+ligula sed libero fermentum, vitae viverra orci consequat. Sed porttitor arcu
+non leo facilisis, eget eleifend erat interdum.
+
+\medskip
+
+Curabitur in odio nec dui dictum blandit. Duis euismod, mauris vel suscipit
+aliquet, tellus elit posuere nibh, at ultricies justo nulla non mauris.
+Suspendisse potenti. Integer sit amet nibh sed ipsum cursus porttitor.
+
+\medskip
+
+Praesent vitae lacus sed arcu condimentum rhoncus. Integer dignissim, neque in
+aliquet convallis, ipsum urna consequat sem, vitae tempor enim mi sed eros.
+Vivamus consequat nisi et erat elementum, quis porta orci facilisis.
+
+\begin{outerdemo}
+Text before the nested box.
+
+\begin{innerdemo}
+Nested breakable content begins here. The first lines should appear on the same
+page as this introduction when there is enough vertical room for a fragment.
+
+\medskip
+Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac
+turpis egestas. Donec odio elit, dictum in, hendrerit sit amet, egestas sed,
+leo. Praesent feugiat sapien aliquet odio. Integer vitae justo. Aliquam
+vestibulum fringilla lorem. Sed neque lectus, consectetur at, consectetuer sed,
+eleifend ac, lectus.
+
+\medskip
+Nulla facilisi. Pellentesque eget lectus. Proin eu metus. Sed porttitor. In hac
+habitasse platea dictumst. Suspendisse eu lectus. Ut mi mi, lacinia sit amet,
+placerat et, mollis vitae, dui. Sed ante tellus, tristique ut, iaculis eu,
+malesuada ac, dui.
+
+\medskip
+Mauris nibh leo, facilisis non, adipiscing quis, ultrices a, dui. Suspendisse
+potenti. Donec aliquet tortor sed accumsan bibendum, erat ligula aliquet magna,
+vitae ornare odio metus a mi. Morbi ac orci et nisl hendrerit mollis.
+
+\medskip
+Suspendisse sed lectus. Ut mi mi, lacinia sit amet, placerat et, mollis vitae,
+dui. Cras non urna. Morbi eros pede, suscipit ac, varius vel, egestas non,
+eros. Praesent malesuada, diam id pretium elementum, eros sem dictum tortor, vel
+consectetuer odio sem sed wisi.
+
+\medskip
+Nam dui ligula, fringilla a, euismod sodales, sollicitudin vel, wisi. Morbi
+auctor lorem non justo. Nam lacus libero, pretium at, lobortis vitae, ultricies
+et, tellus. Donec aliquet, tortor sed accumsan bibendum, erat ligula aliquet
+magna, vitae ornare odio metus a mi.
+
+\medskip
+Curabitur malesuada erat sit amet massa. Fusce blandit. Aliquam erat volutpat.
+Aliquam euismod. Aenean vel lectus. Nunc imperdiet justo nec dolor. Etiam
+euismod. Fusce facilisis lacinia dui. Suspendisse potenti.
+
+\medskip
+Integer posuere, lectus at placerat tincidunt, neque nunc tempor purus, non
+sollicitudin nibh lorem vitae sem. Aenean et justo a nulla faucibus luctus.
+\end{innerdemo}
+
+Text after the nested box.
+\end{outerdemo}
+
+\end{document}
