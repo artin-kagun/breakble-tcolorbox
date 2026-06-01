@@ -1,0 +1,15 @@
+breakble-tcolorbox is an unofficial modified distribution of tcolorbox.
+
+Original work:
+  tcolorbox
+  Copyright (c) 2006-2026 Prof. Dr. Dr. Thomas F. Sturm
+  https://github.com/T-F-S/tcolorbox
+
+This modified distribution is based on upstream tag v6.10.0
+commit 057ff62f77aeef399251ac4fca98d1a20c36ab32.
+
+License:
+  LaTeX Project Public License, version 1.3c or later.
+
+This repository is not maintained by the upstream tcolorbox author.
+See MODIFICATIONS.md for the local changes.

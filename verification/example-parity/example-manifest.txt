@@ -1,0 +1,3 @@
+docs/tcolorbox/tcolorbox-example-poster.tex
+docs/tcolorbox/tcolorbox-example.tex
+docs/tcolorbox/tcolorbox-tutorial-poster.tex
