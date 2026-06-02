@@ -157,26 +157,27 @@ If you want to try the package without setting TeX search paths, use:
 
 - `drop-in/`
 
-The `drop-in/` directory contains `breakble-tcolorbox.sty` and the modified
-`tcolorbox` runtime files in one flat directory. Copy the contents of
-`drop-in/` next to the `.tex` file that you want to compile.
+The `drop-in/` directory contains a copy-ready `breakble-tcolorbox/` directory.
+Copy that directory next to the `.tex` file that you want to compile. This keeps
+the `.sty` and `.code.tex` files out of the top level of your document folder.
 
 For example:
 
 ```text
 your-document/
   main.tex
-  breakble-tcolorbox.sty
-  tcolorbox.sty
-  tcbbreakable.code.tex
-  tcbskins.code.tex
-  ...
+  breakble-tcolorbox/
+    breakble-tcolorbox.sty
+    tcolorbox.sty
+    tcbbreakable.code.tex
+    tcbskins.code.tex
+    ...
 ```
 
 With that layout, the document can simply load:
 
 ```tex
-\usepackage[most]{breakble-tcolorbox}
+\usepackage[most]{breakble-tcolorbox/breakble-tcolorbox}
 ```
 
 This method does not require `TEXINPUTS` or `mktexlsr`. It is convenient for
@@ -444,7 +445,7 @@ for the current run.
 - `docs/tcolorbox/`: upstream documentation, standalone example sources, and assets used by parity checks
 - `docs/readme-demo/`: A4 sample used for the README comparison image
 - `docs/samples/`: additional samples, including titleless nested boxes
-- `drop-in/`: flat file set to copy next to a `.tex` file for manual use
+- `drop-in/`: copy-ready folder for manual use next to a `.tex` file
 - `verification/example-parity/`: generated parity report, source copies, and side-by-side PDFs
 - `verification/nested-behavior/`: generated nested-breakable behavior reports and PDFs
 - `verification/manual-parity/`: generated manual parity report, source copies, rendered pages, and side-by-side PDF
