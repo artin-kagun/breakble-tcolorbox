@@ -217,7 +217,13 @@ TEXINPUTS="/path/to/breakble-tcolorbox/texmf/tex/latex//:" kpsewhich tcolorbox.s
 
 毎回 `TEXINPUTS` を指定せずに使いたい場合は、個人用 TEXMF に入れるのが扱いやすいです。個人用 TEXMF は、TeX が自動で探しに行くユーザー専用の追加パッケージ置き場です。
 
-このリポジトリでは、TEXMF に入れるための安全な配置を用意しています。
+この方法でやることは、次の 3 つです。
+
+1. GitHub にあるこのリポジトリを、自分の PC に置く。
+2. リポジトリ内の配布用フォルダだけを、個人用 TEXMF にコピーする。
+3. TeX がそのファイルを見つけられるか確認する。
+
+コマンドを打つだけで GitHub 上のファイルが直接 TeX に入るわけではありません。まず、このリポジトリを手元に用意して、その中にある次のフォルダをコピーします。
 
 ```text
 texmf/tex/latex/breakble-tcolorbox/
@@ -225,7 +231,35 @@ texmf/tex/latex/breakble-tcolorbox/
 
 このフォルダには `tcolorbox.sty` という名前のファイルを入れていません。そのため、通常の `\usepackage{tcolorbox}` は本家 `tcolorbox` を読み続け、`\usepackage{breakble-tcolorbox}` と書いた文書だけが改変版を使います。
 
-まず、個人用 TEXMF の場所を確認します。macOS でも Windows でも、TeX Live / MacTeX を使っているなら次のコマンドが基本です。
+### 1. GitHub から手元に持ってくる
+
+`git` を使える場合は、好きな作業場所で次のようにします。
+
+```sh
+cd ~/Downloads
+git clone https://github.com/artin-kagun/breakble-tcolorbox.git
+cd breakble-tcolorbox
+```
+
+`git` を使わない場合は、GitHub のページで **Code** → **Download ZIP** を選び、ZIP を展開してください。その後、ターミナルや PowerShell で展開したフォルダへ移動します。
+
+```sh
+cd ~/Downloads/breakble-tcolorbox-main
+```
+
+以降のコマンドは、このリポジトリのルートで実行します。そこに `README.md` や `texmf/` が見えている状態です。
+
+コピーするフォルダがあるか、先に確認しておくと安心です。
+
+```sh
+ls texmf/tex/latex/breakble-tcolorbox
+```
+
+少なくとも `breakble-tcolorbox.sty` や `breakble-tcolorbox-runtime.sty` が表示されれば、その場所で合っています。
+
+### 2. 個人用 TEXMF の場所を確認する
+
+macOS でも Windows でも、TeX Live / MacTeX を使っているなら次のコマンドが基本です。
 
 ```sh
 kpsewhich -var-value=TEXMFHOME
@@ -239,15 +273,25 @@ kpsewhich -var-value=TEXMFHOME
 | Linux / TeX Live | `~/texmf` |
 | Windows / TeX Live | `C:\Users\<ユーザー名>\texmf` |
 
-### macOS / Linux / TeX Live
+### 3. macOS / Linux / TeX Live でコピーする
 
 ```sh
 TEXMFHOME="$(kpsewhich -var-value=TEXMFHOME)"
 mkdir -p "$TEXMFHOME/tex/latex"
+rm -rf "$TEXMFHOME/tex/latex/breakble-tcolorbox"
 cp -R texmf/tex/latex/breakble-tcolorbox "$TEXMFHOME/tex/latex/"
 ```
 
-### Windows / TeX Live
+この 4 行は、順番に次のことをしています。
+
+- `TEXMFHOME=...`: TeX が探しに行く個人用 TEXMF の場所を変数に入れる。
+- `mkdir -p ...`: コピー先の `tex/latex` フォルダを作る。
+- `rm -rf ...`: すでに古い `breakble-tcolorbox` が入っている場合だけ、そのフォルダを入れ直せるように消す。
+- `cp -R ...`: GitHub から持ってきたリポジトリ内の `texmf/tex/latex/breakble-tcolorbox` を、個人用 TEXMF にコピーする。
+
+消しているのは個人用 TEXMF 内の `breakble-tcolorbox` フォルダだけです。本家 `tcolorbox` や他の TeX パッケージは触りません。
+
+### 4. Windows / TeX Live でコピーする
 
 PowerShell では次のようにできます。
 
@@ -255,10 +299,13 @@ PowerShell では次のようにできます。
 $TEXMFHOME = kpsewhich -var-value=TEXMFHOME
 New-Item -ItemType Directory -Force "$TEXMFHOME\tex\latex"
 
+Remove-Item "$TEXMFHOME\tex\latex\breakble-tcolorbox" -Recurse -Force -ErrorAction SilentlyContinue
 Copy-Item .\texmf\tex\latex\breakble-tcolorbox "$TEXMFHOME\tex\latex\" -Recurse -Force
 ```
 
-### Windows / MiKTeX
+これは、リポジトリ内の `texmf\tex\latex\breakble-tcolorbox` フォルダを、Windows の個人用 TEXMF の `tex\latex` の中へコピーしています。
+
+### 5. Windows / MiKTeX
 
 MiKTeX では、TeX Live と同じ `kpsewhich` 方式で分かる場合もありますが、MiKTeX Console でユーザー用の root directory を追加する方が分かりやすいことがあります。
 
@@ -275,7 +322,7 @@ initexmf --register-root=C:\Users\<ユーザー名>\texmf
 initexmf --update-fndb
 ```
 
-### 確認
+### 6. 確認する
 
 `TEXMFHOME` では、TeX Live なら通常はファイル名データベースの更新なしで見つかります。もし TeX が見つけてくれない場合は、次を実行してください。
 

@@ -250,7 +250,14 @@ If you want TeX to find the package without setting `TEXINPUTS` every time, you
 can install it into your personal TEXMF tree. A personal TEXMF tree is your
 user-specific package directory, and TeX searches it automatically.
 
-This repository includes a TEXMF-ready tree:
+This installation does three things:
+
+1. Put this GitHub repository on your computer.
+2. Copy only the packaged directory into your personal TEXMF tree.
+3. Check that TeX can find the package.
+
+The commands below do not magically install files directly from GitHub. First,
+put the repository on your machine, then copy this directory from it:
 
 ```text
 texmf/tex/latex/breakble-tcolorbox/
@@ -261,8 +268,39 @@ Therefore ordinary `\usepackage{tcolorbox}` continues to load upstream
 `tcolorbox`, while documents that say `\usepackage{breakble-tcolorbox}` use the
 modified runtime.
 
-First, find your personal TEXMF root. For TeX Live and MacTeX, this command is
-the usual starting point on both macOS and Windows:
+### 1. Get The Repository From GitHub
+
+If you use `git`, run this in any working directory:
+
+```sh
+cd ~/Downloads
+git clone https://github.com/artin-kagun/breakble-tcolorbox.git
+cd breakble-tcolorbox
+```
+
+If you do not use `git`, choose **Code** -> **Download ZIP** on GitHub, unzip
+the archive, then open a terminal or PowerShell in the extracted directory.
+
+```sh
+cd ~/Downloads/breakble-tcolorbox-main
+```
+
+The following commands assume that you are at the repository root, where
+`README.md` and `texmf/` are visible.
+
+You can check the directory that will be copied with:
+
+```sh
+ls texmf/tex/latex/breakble-tcolorbox
+```
+
+You should see files such as `breakble-tcolorbox.sty` and
+`breakble-tcolorbox-runtime.sty`.
+
+### 2. Find Your Personal TEXMF Root
+
+For TeX Live and MacTeX, this command is the usual starting point on both macOS
+and Windows:
 
 ```sh
 kpsewhich -var-value=TEXMFHOME
@@ -278,15 +316,27 @@ Common locations are:
 
 Always prefer the value printed by `kpsewhich` on your own machine.
 
-### macOS / Linux / TeX Live
+### 3. Copy On macOS / Linux / TeX Live
 
 ```sh
 TEXMFHOME="$(kpsewhich -var-value=TEXMFHOME)"
 mkdir -p "$TEXMFHOME/tex/latex"
+rm -rf "$TEXMFHOME/tex/latex/breakble-tcolorbox"
 cp -R texmf/tex/latex/breakble-tcolorbox "$TEXMFHOME/tex/latex/"
 ```
 
-### Windows / TeX Live
+These lines do the following:
+
+- `TEXMFHOME=...`: stores the personal TEXMF path that TeX searches.
+- `mkdir -p ...`: creates the destination `tex/latex` directory if needed.
+- `rm -rf ...`: removes an older `breakble-tcolorbox` copy before reinstalling it.
+- `cp -R ...`: copies this repository's packaged directory into your personal
+  TEXMF tree.
+
+Only the `breakble-tcolorbox` directory inside your personal TEXMF tree is
+removed. Upstream `tcolorbox` and other TeX packages are not touched.
+
+### 4. Copy On Windows / TeX Live
 
 In PowerShell:
 
@@ -294,10 +344,14 @@ In PowerShell:
 $TEXMFHOME = kpsewhich -var-value=TEXMFHOME
 New-Item -ItemType Directory -Force "$TEXMFHOME\tex\latex"
 
+Remove-Item "$TEXMFHOME\tex\latex\breakble-tcolorbox" -Recurse -Force -ErrorAction SilentlyContinue
 Copy-Item .\texmf\tex\latex\breakble-tcolorbox "$TEXMFHOME\tex\latex\" -Recurse -Force
 ```
 
-### Windows / MiKTeX
+This copies the repository's `texmf\tex\latex\breakble-tcolorbox` directory into
+the `tex\latex` directory in your personal TEXMF tree.
+
+### 5. Windows / MiKTeX
 
 MiKTeX may also provide `kpsewhich`, but many users manage user TEXMF roots
 through MiKTeX Console.
@@ -316,7 +370,7 @@ initexmf --register-root=C:\Users\<username>\texmf
 initexmf --update-fndb
 ```
 
-### Check The Installation
+### 6. Check The Installation
 
 For `TEXMFHOME`, TeX Live usually notices files without rebuilding a filename
 database. If TeX does not find the package, run:
