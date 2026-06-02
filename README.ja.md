@@ -187,9 +187,9 @@ TEXINPUTS="/path/to/breakble-tcolorbox//:" kpsewhich tcolorbox.sty
 
 どちらも、このリポジトリ内のパスを指していれば問題ありません。
 
-## 個人用 TEXMF に入れる方法
+## 高度な方法: 個人用 TEXMF に入れる
 
-毎回 `TEXINPUTS` を指定せずに使いたい場合は、個人用の TEXMF ツリーに入れます。分からない場合は、先に `drop-in/` の手動コピー方式で試すのがおすすめです。個人用 TEXMF は「自分の TeX 環境がいつも探しに行く、ユーザー専用の置き場所」です。
+毎回 `TEXINPUTS` を指定せずに使いたい場合は、個人用の TEXMF ツリーに入れる方法もあります。ただし、元の `tcolorbox` と文書ごとに使い分けたい人には、まず `drop-in/` 方式かプロジェクトごとの `TEXINPUTS` 方式をおすすめします。個人用 TEXMF は「自分の TeX 環境がいつも探しに行く、ユーザー専用の置き場所」です。
 
 注意: この方法では、個人用 TEXMF の中に改変済みの `tcolorbox.sty` を置きます。そのため、TeX の探索順によっては、普通に
 
@@ -198,6 +198,8 @@ TEXINPUTS="/path/to/breakble-tcolorbox//:" kpsewhich tcolorbox.sty
 ```
 
 と書いた文書でも、この改変済み `tcolorbox` が本家より先に見つかることがあります。元の `tcolorbox` と `breakble-tcolorbox` を文書ごとに確実に使い分けたい場合は、個人用 TEXMF へ入れるより、`drop-in/` 方式または `TEXINPUTS` を使うプロジェクトごとの方法を選んでください。
+
+要するに、個人用 TEXMF へのインストールは「自分の環境では、この改変済み `tcolorbox` を通常の `tcolorbox` として優先してもよい」と判断できる場合の方法です。
 
 まず、個人用 TEXMF の場所を確認します。macOS でも Windows でも、TeX Live / MacTeX を使っているなら次のコマンドが基本です。
 
@@ -278,7 +280,7 @@ kpsewhich tcolorbox.sty
 - `MiKTeX register root update fndb`
 - `mktexlsr texhash 違い`
 
-## システム全体の TEXMF に入れる方法
+## 高度な方法: システム全体の TEXMF に入れる
 
 共有の TeX Live 環境に入れる場合は、`TEXMFLOCAL` を使います。
 
@@ -317,13 +319,22 @@ sudo mktexlsr
 
 この場合、後からそのパッケージが `\RequirePackage{tcolorbox}` を実行しても、LaTeX から見ると `tcolorbox` はすでに読み込み済みです。つまり、`breakble-tcolorbox` が読み込んだ改変済み `tcolorbox` が使われます。
 
-一方で、文書クラスやパッケージがプリアンブルより前、または `breakble-tcolorbox` より前に `tcolorbox` を読み込んでしまう場合、あとからラッパーで差し替えることはできません。その場合は、このリポジトリの `tcolorbox/` を本家 `tcolorbox` より先に TeX の探索パスへ置き、ラッパーは後から読み込まないでください。
+`drop-in/` 方式でフォルダごと置いている場合も考え方は同じです。
+
+```tex
+\usepackage[most]{breakble-tcolorbox/breakble-tcolorbox}
+\usepackage{some-package-that-uses-tcolorbox}
+```
+
+この場合も、後から読み込まれるパッケージは改変済み `tcolorbox` を共有します。つまり、順番を調整できる文書では、`drop-in/` 方式や `TEXINPUTS` 方式を使えば、環境全体の普通の `tcolorbox` を置き換えず、その文書では改変版を使えます。
+
+一方で、文書クラスやパッケージがプリアンブルより前、または `breakble-tcolorbox` より前に `tcolorbox` を読み込んでしまう場合、あとからラッパーで差し替えることはできません。その場合、その文書でどうしても改変版を使いたいなら、このリポジトリの `tcolorbox/` を本家 `tcolorbox` より先に TeX の探索パスへ置き、ラッパーは後から読み込まないでください。
 
 ```sh
 TEXINPUTS="/path/to/breakble-tcolorbox/tcolorbox//:" latexmk -pdf main.tex
 ```
 
-これにより、内部の `\RequirePackage{tcolorbox}` が、改変済みの実行時ファイルを直接見つけます。次のコマンドや `.log` ファイルで、どの `tcolorbox.sty` が読まれているか確認してください。
+これにより、そのコンパイルでは、内部の `\RequirePackage{tcolorbox}` が改変済みの実行時ファイルを直接見つけます。次のコマンドや `.log` ファイルで、どの `tcolorbox.sty` が読まれているか確認してください。
 
 ```sh
 TEXINPUTS="/path/to/breakble-tcolorbox/tcolorbox//:" kpsewhich tcolorbox.sty

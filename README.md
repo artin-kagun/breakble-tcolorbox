@@ -213,12 +213,13 @@ TEXINPUTS="/path/to/breakble-tcolorbox//:" kpsewhich tcolorbox.sty
 
 Both paths should point into this repository.
 
-## Personal TEXMF Installation
+## Advanced: Personal TEXMF Installation
 
-If you want TeX to find the package without setting `TEXINPUTS` every time,
-install it into your personal TEXMF tree. If this is unfamiliar, try the
-`drop-in/` method first. A personal TEXMF tree is the user-specific directory
-that your TeX system searches automatically.
+If you want TeX to find the package without setting `TEXINPUTS` every time, you
+can install it into your personal TEXMF tree. However, if you want to choose
+between upstream `tcolorbox` and this package document by document, prefer the
+`drop-in/` method or the project-local `TEXINPUTS` method. A personal TEXMF tree
+is the user-specific directory that your TeX system searches automatically.
 
 Important: this method puts a modified `tcolorbox.sty` into your personal TEXMF
 tree. Depending on TeX's search order, a document that simply says
@@ -231,6 +232,10 @@ may find this modified copy before the upstream copy. If you want to choose
 between upstream `tcolorbox` and `breakble-tcolorbox` on a document-by-document
 basis, prefer the `drop-in/` method or the project-local `TEXINPUTS` method
 instead of installing into your personal TEXMF tree.
+
+In short, use a personal TEXMF installation only when you are comfortable with
+this modified copy being preferred as the normal `tcolorbox` in your own TeX
+environment.
 
 First, find your personal TEXMF root. For TeX Live and MacTeX, this command is
 the usual starting point on both macOS and Windows:
@@ -320,7 +325,7 @@ Useful search terms:
 - `MiKTeX register root update fndb`
 - `mktexlsr texhash difference`
 
-## Site-Wide TEXMF Installation
+## Advanced: Site-Wide TEXMF Installation
 
 For a shared TeX Live installation, use `TEXMFLOCAL`:
 
@@ -366,17 +371,29 @@ When that later package calls `\RequirePackage{tcolorbox}`, LaTeX sees that
 `tcolorbox` is already loaded. It will use the modified copy that
 `breakble-tcolorbox` loaded.
 
+The same idea applies to the `drop-in/` method:
+
+```tex
+\usepackage[most]{breakble-tcolorbox/breakble-tcolorbox}
+\usepackage{some-package-that-uses-tcolorbox}
+```
+
+In that case, later packages share the modified `tcolorbox` already loaded by
+the wrapper. So when you can control package order, the `drop-in/` and
+project-local `TEXINPUTS` methods let one document use the modified copy without
+changing the default `tcolorbox` for the whole TeX environment.
+
 If a document class or package loads `tcolorbox` before you have a chance to
-load `breakble-tcolorbox`, the wrapper cannot replace it afterward. In that
-case, put this repository before the system `tcolorbox` on TeX's search path and
-do not load the wrapper later:
+load `breakble-tcolorbox`, the wrapper cannot replace it afterward. If you still
+need the modified copy for that document, put this repository before the system
+`tcolorbox` on TeX's search path and do not load the wrapper later:
 
 ```sh
 TEXINPUTS="/path/to/breakble-tcolorbox/tcolorbox//:" latexmk -pdf main.tex
 ```
 
-Then a direct internal `\RequirePackage{tcolorbox}` will resolve to the modified
-runtime copy. Confirm this in the `.log` file or with:
+For that compilation, a direct internal `\RequirePackage{tcolorbox}` will
+resolve to the modified runtime copy. Confirm this in the `.log` file or with:
 
 ```sh
 TEXINPUTS="/path/to/breakble-tcolorbox/tcolorbox//:" kpsewhich tcolorbox.sty
