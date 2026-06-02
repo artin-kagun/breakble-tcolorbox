@@ -220,6 +220,18 @@ install it into your personal TEXMF tree. If this is unfamiliar, try the
 `drop-in/` method first. A personal TEXMF tree is the user-specific directory
 that your TeX system searches automatically.
 
+Important: this method puts a modified `tcolorbox.sty` into your personal TEXMF
+tree. Depending on TeX's search order, a document that simply says
+
+```tex
+\usepackage{tcolorbox}
+```
+
+may find this modified copy before the upstream copy. If you want to choose
+between upstream `tcolorbox` and `breakble-tcolorbox` on a document-by-document
+basis, prefer the `drop-in/` method or the project-local `TEXINPUTS` method
+instead of installing into your personal TEXMF tree.
+
 First, find your personal TEXMF root. For TeX Live and MacTeX, this command is
 the usual starting point on both macOS and Windows:
 
@@ -293,9 +305,11 @@ kpsewhich breakble-tcolorbox.sty
 kpsewhich tcolorbox.sty
 ```
 
-When this package is installed this way, `kpsewhich tcolorbox.sty` should also
-point to the modified copy under `breakble-tcolorbox/tcolorbox/`. This is
-expected: the wrapper works by loading a modified `tcolorbox.sty`.
+When this package is installed this way, `kpsewhich tcolorbox.sty` may also
+point to the modified copy under `breakble-tcolorbox/tcolorbox/`. That can be
+expected because the wrapper works by loading a modified `tcolorbox.sty`. Avoid
+this installation method if your environment should always prefer upstream
+`tcolorbox`.
 
 Useful search terms:
 
@@ -331,7 +345,10 @@ sudo mktexlsr
 ```
 
 Choose a site-wide install when you want this modified `tcolorbox` to be found
-before the upstream copy for documents compiled in that TeX installation.
+before the upstream copy for documents compiled in that TeX installation. In
+other words, ordinary `\usepackage{tcolorbox}` may also use the modified copy.
+Do not use this method if you need to keep upstream `tcolorbox` available as the
+default in the same TeX installation.
 
 ## If Another Package Loads `tcolorbox`
 

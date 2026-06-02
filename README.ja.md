@@ -191,6 +191,14 @@ TEXINPUTS="/path/to/breakble-tcolorbox//:" kpsewhich tcolorbox.sty
 
 毎回 `TEXINPUTS` を指定せずに使いたい場合は、個人用の TEXMF ツリーに入れます。分からない場合は、先に `drop-in/` の手動コピー方式で試すのがおすすめです。個人用 TEXMF は「自分の TeX 環境がいつも探しに行く、ユーザー専用の置き場所」です。
 
+注意: この方法では、個人用 TEXMF の中に改変済みの `tcolorbox.sty` を置きます。そのため、TeX の探索順によっては、普通に
+
+```tex
+\usepackage{tcolorbox}
+```
+
+と書いた文書でも、この改変済み `tcolorbox` が本家より先に見つかることがあります。元の `tcolorbox` と `breakble-tcolorbox` を文書ごとに確実に使い分けたい場合は、個人用 TEXMF へ入れるより、`drop-in/` 方式または `TEXINPUTS` を使うプロジェクトごとの方法を選んでください。
+
 まず、個人用 TEXMF の場所を確認します。macOS でも Windows でも、TeX Live / MacTeX を使っているなら次のコマンドが基本です。
 
 ```sh
@@ -259,7 +267,7 @@ kpsewhich breakble-tcolorbox.sty
 kpsewhich tcolorbox.sty
 ```
 
-この方法で入れた場合、`kpsewhich tcolorbox.sty` も `breakble-tcolorbox/tcolorbox/` 以下の改変済みファイルを指すのが期待される状態です。このパッケージは、ラッパーから改変済みの `tcolorbox.sty` を読み込む形で動くためです。
+この方法で入れた場合、`kpsewhich tcolorbox.sty` も `breakble-tcolorbox/tcolorbox/` 以下の改変済みファイルを指すことがあります。これは、ラッパーから改変済みの `tcolorbox.sty` を読み込む形で動くためです。元の `tcolorbox` を常に優先したい環境では、このインストール方法は避けてください。
 
 より詳しく調べたい場合は、次の語句で検索すると情報にたどり着きやすいです。
 
@@ -294,7 +302,7 @@ sudo cp -R tcolorbox "$TEXMFLOCAL/tex/latex/breakble-tcolorbox/"
 sudo mktexlsr
 ```
 
-ただし、この方法では、その TeX 環境でコンパイルする文書に対して、改変済み `tcolorbox` が本家より先に見つかる可能性があります。環境全体に影響するため、チームや端末全体でこの挙動を使いたい場合に選んでください。
+ただし、この方法では、その TeX 環境でコンパイルする文書に対して、改変済み `tcolorbox` が本家より先に見つかる可能性があります。つまり、普通の `\usepackage{tcolorbox}` でも改変版が使われることがあります。環境全体に影響するため、チームや端末全体でこの挙動を使いたい場合に選んでください。元の `tcolorbox` と併用したい場合は、この方法はおすすめしません。
 
 ## 別パッケージの内部で `tcolorbox` が読み込まれる場合
 
