@@ -5,15 +5,30 @@
 `breakble-tcolorbox` は
 [`tcolorbox`](https://github.com/T-F-S/tcolorbox) 6.10.0 をベースにした、非公式の改変版です。
 
-公開されている `tcolorbox` の使い方との互換性を保ちながら、入れ子になった `breakable` box のページ分割を改善するためのパッケージです。親の `tcolorbox` が `breakable` のとき、その中に入れた通常の `breakable` な `tcolorbox` も、親のページ分割の流れに沿って自然に分割できるようにします。
+公開されている `tcolorbox` の使い方との互換性を保ちながら、入れ子になった `breakable` ボックスのページ分割を改善するためのパッケージです。親の `tcolorbox` が `breakable` のとき、その中に入れた通常の `breakable` な `tcolorbox` も、親のページ分割の流れに沿って自然に分割できるようにします。
 
 このパッケージで大切にしていることは次のとおりです。
 
 - 入れ子ではない通常の `tcolorbox` の出力は、元の `tcolorbox` と同じにする。
-- upstream の example や manual source の出力も、元の `tcolorbox` と同じに保つ。
-- `breakable` な box の中に長い `breakable` box を入れたとき、内側の box が丸ごと次ページへ送られて大きな空白を作るのではなく、今のページに残っている領域から自然に始まるようにする。
+- upstream のサンプルやマニュアルソースの出力も、元の `tcolorbox` と同じに保つ。
+- `breakable` なボックスの中に長い `breakable` ボックスを入れたとき、内側のボックスが丸ごと次ページへ送られて大きな空白を作るのではなく、今のページに残っている領域から自然に始まるようにする。
 
 このリポジトリは upstream の `tcolorbox` 作者による公式配布物ではなく、upstream maintainer と提携しているものでもありません。
+
+## 目次
+
+- [まず使うなら](#まず使うなら)
+- [見た目として何が変わるか](#見た目として何が変わるか)
+- [どのファイルを使うのか](#どのファイルを使うのか)
+- [手動コピーで試す方法](#手動コピーで試す方法)
+- [プロジェクトごとに使う方法](#プロジェクトごとに使う方法)
+- [個人用 TEXMF に入れる](#個人用-texmf-に入れる)
+- [システム全体の TEXMF に入れる](#システム全体の-texmf-に入れる)
+- [別パッケージの内部で `tcolorbox` が読み込まれる場合](#別パッケージの内部で-tcolorbox-が読み込まれる場合)
+- [基本情報](#基本情報)
+- [検証](#検証)
+- [リポジトリ構成](#リポジトリ構成)
+- [Upstream](#upstream)
 
 ## まず使うなら
 
@@ -46,13 +61,13 @@
 
 ## 見た目として何が変わるか
 
-元の `tcolorbox` では、通常の入れ子になった `breakable` box は、実質的にはその場でページ分割できません。そのため、内側の box が今のページの残り部分に収まらないと、内側の box が丸ごと次のページへ送られ、ページ下部に大きな空白ができることがあります。
+元の `tcolorbox` では、通常の方法で入れ子にした `breakable` ボックスは、実質的にはその場でページ分割できません。そのため、内側のボックスが今のページの残り部分に収まらないと、内側のボックスが丸ごと次のページへ送られ、ページ下部に大きな空白ができることがあります。
 
-`breakble-tcolorbox` では、内側の box を親の `breakable` box のページ分割の流れに参加させます。そのため、内側の box の最初の断片が、今のページに残っている領域から始まります。
+`breakble-tcolorbox` では、内側のボックスを親の `breakable` ボックスのページ分割の流れに参加させます。そのため、内側のボックスの最初の断片が、今のページに残っている領域から始まります。
 
 下の比較は、同じ A4 文書をコンパイルしたものです。左が元の `tcolorbox`、右が `breakble-tcolorbox` です。比較では、本文は同じまま、読み込むパッケージを切り替えています。
 
-1ページ目では、元の `tcolorbox` がページ下部を大きく空けて内側の box を次ページへ送っている一方で、`breakble-tcolorbox` は同じページの残り領域から内側の box を始めています。2ページ目を見ると、右側の内側 box が実際にページをまたいで続いていることも確認できます。
+1ページ目では、元の `tcolorbox` がページ下部を大きく空けて内側のボックスを次ページへ送っている一方で、`breakble-tcolorbox` は同じページの残り領域から内側のボックスを始めています。2ページ目を見ると、右側の内側ボックスが実際にページをまたいで続いていることも確認できます。
 
 ![Nested breakable comparison page 1](docs/readme-demo/images/nested-breakable-comparison-page-000001.png)
 
@@ -72,7 +87,7 @@ Text before the nested box.
 Nested breakable content begins here.
 
 % Long ordinary prose follows.
-% 元の tcolorbox では、この内側 box が次ページへ送られます。
+% 元の tcolorbox では、この内側ボックスが次ページへ送られます。
 % breakble-tcolorbox では、ここから始まり、次ページへ続きます。
 \end{innerdemo}
 
@@ -115,25 +130,33 @@ TEXINPUTS="$PWD:$PWD/../../texmf/tex/latex//:" \
 
 ## どのファイルを使うのか
 
-ユーザーが文書から直接読み込む入口は、次のファイルです。
+文書から直接読み込む入口は、次のファイルです。
 
 - `breakble-tcolorbox.sty`
 
-コンパイル時には、同じ場所に次の実行時ファイルも必要です。
+コンパイル時には、同じ場所に次の実行時ファイルも必要です。これらはラッパーが自動で読むため、文書から手で読み込む必要はありません。
 
 - `breakble-tcolorbox-runtime.sty`
 - `breakble-tcb*.code.tex`
 
-これらは upstream の `tcolorbox` 実行時ファイルを元にした改変済みコピーです。TEXMF に入れて常用しても、普通の `\usepackage{tcolorbox}` を巻き込まないように、ファイル名は本家の `tcolorbox.sty` や `tcbbreakable.code.tex` とは別名にしています。
+これらは upstream の `tcolorbox` 実行時ファイルを元にした改変済みコピーです。配布用ファイルには `breakble-` という接頭辞を付け、本家の `tcolorbox.sty` や `tcbbreakable.code.tex` と同じ名前にならないようにしています。
 
-ユーザーが直接読み込むのは `breakble-tcolorbox.sty` だけです。`breakble-tcolorbox-runtime.sty` や `breakble-tcb*.code.tex` は手で読み込まず、同じフォルダに置いておいてください。
+そのため、個人用 TEXMF やシステム TEXMF に入れても、`breakble-tcolorbox` を明示していない文書の
 
-このリポジトリには開発・検証用の `tcolorbox/` ディレクトリもあります。これは改変元を追いやすくするための作業用コピーです。TEXMF に入れるときは、リポジトリ全体や `tcolorbox/` をそのまま入れず、後述の `texmf/tex/latex/breakble-tcolorbox/` を使ってください。
+```tex
+\usepackage{tcolorbox}
+```
 
-文書内では、通常は次を読み込めば使えます。
+は通常どおり本家 `tcolorbox` を読みます。改変版を使うのは、次のように明示した文書だけです。
 
 ```tex
 \usepackage[most]{breakble-tcolorbox}
+```
+
+このリポジトリには開発・検証用の `tcolorbox/` ディレクトリもあります。これは差分確認や検証スクリプトのための作業用コピーで、通常のインストール先ではありません。TEXMF に入れるときは、リポジトリ全体や `tcolorbox/` ではなく、次の配布用フォルダを使ってください。
+
+```text
+texmf/tex/latex/breakble-tcolorbox/
 ```
 
 ## 手動コピーで試す方法
@@ -192,7 +215,7 @@ TEXINPUTS="/path/to/breakble-tcolorbox/texmf/tex/latex//:" kpsewhich tcolorbox.s
 
 ## 個人用 TEXMF に入れる
 
-毎回 `TEXINPUTS` を指定せずに使いたい場合は、個人用の TEXMF ツリーに入れるのが扱いやすいです。個人用 TEXMF は「自分の TeX 環境がいつも探しに行く、ユーザー専用の置き場所」です。
+毎回 `TEXINPUTS` を指定せずに使いたい場合は、個人用 TEXMF に入れるのが扱いやすいです。個人用 TEXMF は、TeX が自動で探しに行くユーザー専用の追加パッケージ置き場です。
 
 このリポジトリでは、TEXMF に入れるための安全な配置を用意しています。
 
@@ -200,7 +223,7 @@ TEXINPUTS="/path/to/breakble-tcolorbox/texmf/tex/latex//:" kpsewhich tcolorbox.s
 texmf/tex/latex/breakble-tcolorbox/
 ```
 
-この中には `tcolorbox.sty` という名前のファイルを入れていません。そのため、通常の `\usepackage{tcolorbox}` は本家 `tcolorbox` を読み続け、`\usepackage{breakble-tcolorbox}` と書いた文書だけが改変版を使う設計です。
+このフォルダには `tcolorbox.sty` という名前のファイルを入れていません。そのため、通常の `\usepackage{tcolorbox}` は本家 `tcolorbox` を読み続け、`\usepackage{breakble-tcolorbox}` と書いた文書だけが改変版を使います。
 
 まず、個人用 TEXMF の場所を確認します。macOS でも Windows でも、TeX Live / MacTeX を使っているなら次のコマンドが基本です。
 
@@ -317,43 +340,55 @@ sudo mktexlsr
 
 ## 別パッケージの内部で `tcolorbox` が読み込まれる場合
 
-ここは少し注意が必要です。
+別パッケージや文書クラスが内部で `\RequirePackage{tcolorbox}` を実行することがあります。この場合は、読み込み順によって結果が変わります。
 
-自分でプリアンブルの順番を調整できるなら、`tcolorbox` を内部で使うパッケージより前に `breakble-tcolorbox` を読み込んでください。
+### `breakble-tcolorbox` を先に読める場合
+
+自分でプリアンブルの順番を調整できるなら、`tcolorbox` を内部で使うパッケージより先に `breakble-tcolorbox` を読み込んでください。
 
 ```tex
 \usepackage[most]{breakble-tcolorbox}
 \usepackage{some-package-that-uses-tcolorbox}
 ```
 
-この場合、後からそのパッケージが `\RequirePackage{tcolorbox}` を実行しても、LaTeX から見ると `tcolorbox` はすでに読み込み済みです。つまり、`breakble-tcolorbox` が読み込んだ改変済み `tcolorbox` が使われます。
+この場合、後から別パッケージが `\RequirePackage{tcolorbox}` を実行しても、LaTeX から見ると `tcolorbox` はすでに読み込み済みです。そのため、別パッケージも `breakble-tcolorbox` が読み込んだ改変済み実行時ファイルを共有します。
 
-`drop-in/` 方式でフォルダごと置いている場合も考え方は同じです。
+これは、個人用 TEXMF、システム TEXMF、プロジェクトごとの `TEXINPUTS`、`drop-in/` のどの方法で入れていても同じです。`drop-in/` 方式では、読み込み行だけ次のようになります。
 
 ```tex
 \usepackage[most]{breakble-tcolorbox/breakble-tcolorbox}
 \usepackage{some-package-that-uses-tcolorbox}
 ```
 
-この場合も、後から読み込まれるパッケージは改変済み `tcolorbox` を共有します。つまり、順番を調整できる文書では、`drop-in/` 方式や `TEXINPUTS` 方式を使えば、環境全体の普通の `tcolorbox` を置き換えず、その文書では改変版を使えます。
+この使い方なら、TeX 環境全体の本家 `tcolorbox` を置き換えずに、その文書だけで改変版を使えます。
 
-一方で、文書クラスやパッケージがプリアンブルより前、または `breakble-tcolorbox` より前に `tcolorbox` を読み込んでしまう場合、あとからラッパーで差し替えることはできません。この場合は読み込み順を変えるのが基本です。
+### 先に本家 `tcolorbox` が読み込まれてしまう場合
 
-どうしても読み込み順を変えられず、その文書だけで改変版を強制したい場合は、開発用の `tcolorbox/` を本家より先に TeX の探索パスへ置く方法もあります。ただしこれは通常の `\usepackage{tcolorbox}` も改変版へ向ける意図的な上書きです。常用のインストール方法としては使わないでください。
+文書クラスや別パッケージが、`breakble-tcolorbox` より前に本家 `tcolorbox` を読み込んでしまう場合は、あとから差し替えることはできません。一度読み込まれた LaTeX パッケージを、別の実装に静かに入れ替えると、実行時ファイルが混ざって壊れる可能性があるためです。
+
+この場合、`breakble-tcolorbox` はそのまま続行せず、読み込み順の問題として止まるようにしています。基本的な対処は、`breakble-tcolorbox` を先に読むようにプリアンブルや文書クラスの設定を変えることです。
+
+### 読み込み順を変えられない場合の最終手段
+
+どうしても読み込み順を変えられず、その文書だけで改変版を強制したい場合は、開発用の `tcolorbox/` を本家より先に TeX の探索パスへ置く方法があります。
+
+これは通常の `\usepackage{tcolorbox}` も改変版へ向ける、意図的な上書きです。個人用 TEXMF やシステム TEXMF に入れる通常の方法としては使わないでください。使う場合も、対象の文書をコンパイルするときだけに限定してください。
 
 ```sh
 TEXINPUTS="/path/to/breakble-tcolorbox/tcolorbox//:" latexmk -pdf main.tex
 ```
 
-この上書き方式を使うときは、`.log` ファイルや `kpsewhich` で、どの `tcolorbox.sty` が読まれているか必ず確認してください。
+この上書き方式を使うときは、`.log` ファイルや `kpsewhich` で、どの `tcolorbox.sty` が読まれているか必ず確認してください。意図せず通常の文書まで改変版へ向いていないかを見るためです。
 
-また、後から読み込まれるパッケージが `tcolorbox` にオプションを渡す場合は、必要になりそうなライブラリを先に読み込んでおくと option clash を避けやすくなります。
+### オプション衝突を避ける
 
 ```tex
 \usepackage[most]{breakble-tcolorbox}
 ```
 
-`most` はよく使われる `tcolorbox` ライブラリをまとめて読み込むため、多くの場合はこれで十分です。
+後から読み込まれるパッケージが `tcolorbox` にオプションを渡す場合、すでに読み込まれた `tcolorbox` へ別のオプションを追加しようとして `Option clash` エラーになることがあります。
+
+必要になりそうなライブラリは、最初の `breakble-tcolorbox` 読み込み時にまとめて指定してください。`most` はよく使われる `tcolorbox` ライブラリをまとめて読み込むため、多くの場合はこれで足ります。
 
 ## 基本情報
 
@@ -364,14 +399,14 @@ TEXINPUTS="/path/to/breakble-tcolorbox/tcolorbox//:" latexmk -pdf main.tex
 
 ## 検証
 
-開発中に固めた nested breakable の要件は `docs/nested-breakable-requirements.md` に残しています。
+開発中に固めた入れ子 `breakable` の要件は `docs/nested-breakable-requirements.md` に残しています。
 
-upstream の standalone example と manual source を、それぞれ次の 2 通りでコンパイルします。
+upstream の単体サンプルとマニュアルソースを、それぞれ次の 2 通りでコンパイルします。
 
-- original `tcolorbox` 6.10.0
+- 元の `tcolorbox` 6.10.0
 - この `breakble-tcolorbox` 配布版
 
-生成されたページを pixel 単位で比較し、左に元の出力、右に breakble 版を並べた比較 PDF も生成します。
+生成されたページをピクセル単位で比較し、左に元の出力、右に `breakble-tcolorbox` 版を並べた比較 PDF も生成します。
 
 ### PDF で確認できるもの
 
@@ -380,19 +415,19 @@ upstream の standalone example と manual source を、それぞれ次の 2 通
 - `docs/readme-demo/nested-breakable-comparison.pdf`:
   README の説明に使っている基本の比較例です。左が元の `tcolorbox`、右が `breakble-tcolorbox` です。
 - `verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf`:
-  入れ子の `breakable` box が、元の `tcolorbox` と `breakble-tcolorbox` でどう違うかをケースごとに並べた比較 PDF です。
+  入れ子の `breakable` ボックスが、元の `tcolorbox` と `breakble-tcolorbox` でどう違うかをケースごとに並べた比較 PDF です。
 - `verification/nested-behavior/pdf/a4-nested-title-mix.pdf`:
   継続タイトルあり・なしが混ざる入れ子で、上下の余白や重なりが自然になるかを確認する PDF です。
 - `verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf`:
   より深い入れ子で、継続タイトルあり・なしが混ざる場合を確認する PDF です。
 - `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`:
-  途中ページから始まる box、タイトルなしの継続、多重入れ子、装飾付きの上下部分などをまとめて確認する PDF です。
+  途中ページから始まるボックス、タイトルなしの継続、多重入れ子、装飾付きの上下部分などをまとめて確認する PDF です。
 - `verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf`:
   タイトルなしの入れ子を 2, 3, 4, 5, 6 段で確認する PDF です。
 - `verification/nested-behavior/pdf/a4-titleless-reach-reference.pdf`:
   入れ子なしの通常の `tcolorbox` がページ下部へどこまで到達するかを見るための基準 PDF です。
 
-upstream の standalone example については、左に元の出力、右に breakble 版を並べた比較 PDF があります。
+upstream の単体サンプルについては、左に元の出力、右に `breakble-tcolorbox` 版を並べた比較 PDF があります。
 
 - `verification/example-parity/side-by-side/tcolorbox-example/tcolorbox-example__original-side-by-side.pdf`
 - `verification/example-parity/side-by-side/tcolorbox-example-poster/tcolorbox-example-poster__original-side-by-side.pdf`
@@ -404,40 +439,42 @@ upstream のマニュアル本文は、次のファイルです。
 
 - `docs/tcolorbox/tcolorbox.tex`
 
-このファイルから、`docs/tcolorbox/tcolorbox.doc.*.tex` の各断片が読み込まれます。改良版でマニュアル全体をコンパイルして確認する場合は、次を実行します。
+このファイルから、`docs/tcolorbox/tcolorbox.doc.*.tex` の各断片が読み込まれます。`breakble-tcolorbox` でマニュアル全体をコンパイルして確認する場合は、次を実行します。
 
 ```sh
 scripts/check-upstream-manual-parity.py
 ```
 
+このスクリプトは検証用に、開発用の `tcolorbox/` を一時的に TeX の探索パス先頭へ置きます。upstream のマニュアルソースは通常の `\usepackage{tcolorbox}` を含むため、その呼び出しを改変版へ向けて比較するためです。これは通常のインストール方法ではなく、検証スクリプト内だけの扱いです。
+
 実行後、主な出力は次の場所にできます。
 
-- 改良版でコンパイルしたマニュアル:
+- `breakble-tcolorbox` でコンパイルしたマニュアル:
   `verification/manual-parity/sources/breakble/tcolorbox.pdf`
 - 元の `tcolorbox` でコンパイルしたマニュアル:
   `verification/manual-parity/sources/original/tcolorbox.pdf`
-- 左に元の出力、右に breakble 版を並べたマニュアル比較 PDF:
+- 左に元の出力、右に `breakble-tcolorbox` 版を並べたマニュアル比較 PDF:
   `verification/manual-parity/side-by-side/tcolorbox-manual/tcolorbox-side-by-side.pdf`
 - 実行結果のレポート:
   `verification/manual-parity/report.md`
 
 `verification/manual-parity/` は、マニュアル全体の PDF やレンダリング画像を含む生成物なので、Git では無視しています。手元で上のスクリプトを実行すると再生成されます。
 
-nested behavior のレポート:
+入れ子挙動のレポート:
 
 - `verification/nested-behavior/report.md`
 
-standalone example parity のレポート:
+単体サンプルの一致確認レポート:
 
 - `verification/example-parity/report.md`
 
-standalone example parity の再生成:
+単体サンプルの一致確認を再生成:
 
 ```sh
 scripts/check-upstream-example-parity.py
 ```
 
-manual parity の再生成:
+マニュアル一致確認の再生成:
 
 ```sh
 scripts/check-upstream-manual-parity.py
@@ -457,16 +494,16 @@ scripts/run-full-verification.sh
 - `breakble-tcolorbox-runtime.sty`, `breakble-tcb*.code.tex`: 本家と同名にならないようにした改変済み実行時ファイル
 - `texmf/tex/latex/breakble-tcolorbox/`: 個人用 TEXMF やシステム TEXMF へコピーする配布用フォルダ
 - `tcolorbox/`: 開発・検証用の改変済み upstream 実行時ファイル
-- `vendor/tcolorbox-original/`: parity check 用の未改変 upstream 実行時ファイル
-- `docs/nested-breakable-requirements.md`: nested breakable 挙動について開発中に固めた要件
-- `docs/tcolorbox/`: parity check に使う upstream documentation、standalone example sources、assets
+- `vendor/tcolorbox-original/`: 出力一致検証に使う未改変 upstream 実行時ファイル
+- `docs/nested-breakable-requirements.md`: 入れ子 `breakable` 挙動について開発中に固めた要件
+- `docs/tcolorbox/`: 出力一致検証に使う upstream のドキュメント、単体サンプルソース、画像など
 - `docs/readme-demo/`: README の比較画像に使う A4 サンプル
 - `docs/samples/`: タイトルなし入れ子などの追加サンプル
 - `drop-in/`: `.tex` と同じ階層へフォルダごとコピーして使うためのファイル一式
-- `scripts/build-safe-runtime-tree.py`: `tcolorbox/` から同名衝突を避ける配布用 runtime を生成するスクリプト
-- `verification/example-parity/`: 生成済み parity report、source copies、side-by-side PDFs
-- `verification/nested-behavior/`: nested breakable の確認用レポートと PDF
-- `verification/manual-parity/`: 生成される manual parity report、source copies、rendered pages、side-by-side PDF
+- `scripts/build-safe-runtime-tree.py`: `tcolorbox/` から同名衝突を避ける配布用実行時ファイルを生成するスクリプト
+- `verification/example-parity/`: 生成済みの一致確認レポート、ソースコピー、左右比較 PDF
+- `verification/nested-behavior/`: 入れ子 `breakable` の確認用レポートと PDF
+- `verification/manual-parity/`: 生成されるマニュアル一致確認レポート、ソースコピー、レンダリング画像、左右比較 PDF
 
 ## Upstream
 

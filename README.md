@@ -20,6 +20,21 @@ The intended result is:
 This repository is not affiliated with, maintained by, or endorsed by the
 upstream `tcolorbox` maintainer.
 
+## Contents
+
+- [Quick Use](#quick-use)
+- [What Changes Visually](#what-changes-visually)
+- [Which Files Are Used](#which-files-are-used)
+- [Manual Copy Installation](#manual-copy-installation)
+- [Project-Local Installation](#project-local-installation)
+- [Personal TEXMF Installation](#personal-texmf-installation)
+- [Site-Wide TEXMF Installation](#site-wide-texmf-installation)
+- [If Another Package Loads `tcolorbox`](#if-another-package-loads-tcolorbox)
+- [Status](#status)
+- [Verification](#verification)
+- [Repository Layout](#repository-layout)
+- [Upstream](#upstream)
+
 ## Quick Use
 
 Load this package instead of loading `tcolorbox` directly:
@@ -129,37 +144,42 @@ TEXINPUTS="$PWD:$PWD/../../texmf/tex/latex//:" \
 
 ## Which Files Are Used
 
-For normal use, the user-facing entry point is:
+The document-facing entry point is:
 
 - `breakble-tcolorbox.sty`
 
-The following runtime files are also required in the same directory:
+The following runtime files must be next to it at compile time. The wrapper loads
+them automatically; documents should not load them by hand.
 
 - `breakble-tcolorbox-runtime.sty`
 - `breakble-tcb*.code.tex`
 
 Those files are modified copies of upstream `tcolorbox` runtime files. Their
-filenames are intentionally different from upstream filenames such as
-`tcolorbox.sty` and `tcbbreakable.code.tex`. This allows the package to be
-installed in a TEXMF tree while ordinary `\usepackage{tcolorbox}` continues to
-find the upstream package.
+filenames are prefixed with `breakble-`, so they do not collide with upstream
+filenames such as `tcolorbox.sty` and `tcbbreakable.code.tex`.
 
-The only file a document loads directly is `breakble-tcolorbox.sty`. Do not load
-`breakble-tcolorbox-runtime.sty` or the `breakble-tcb*.code.tex` files by hand;
-keep them next to the wrapper.
+That means the package can be installed in a personal or site-wide TEXMF tree
+without changing what an ordinary document gets from:
 
-This repository also contains a development and verification copy named
-`tcolorbox/`. Do not install the whole repository or that `tcolorbox/` directory
-into a TEXMF tree. For TEXMF installation, use
-`texmf/tex/latex/breakble-tcolorbox/`.
+```tex
+\usepackage{tcolorbox}
+```
 
-In a document, load:
+Only documents that explicitly load this package use the modified runtime:
 
 ```tex
 \usepackage[most]{breakble-tcolorbox}
 ```
 
-Do not load the runtime files directly. The wrapper loads them.
+This repository also contains a development and verification copy named
+`tcolorbox/`. It is useful for inspecting the patch and for verification
+scripts, but it is not the normal installation target. Do not install the whole
+repository or that `tcolorbox/` directory into a TEXMF tree. For TEXMF
+installation, use:
+
+```text
+texmf/tex/latex/breakble-tcolorbox/
+```
 
 ## Manual Copy Installation
 
@@ -227,8 +247,8 @@ continue to point to upstream `tcolorbox` from TeX Live, MacTeX, or MiKTeX.
 ## Personal TEXMF Installation
 
 If you want TeX to find the package without setting `TEXINPUTS` every time, you
-can install it into your personal TEXMF tree. A personal TEXMF tree is the
-user-specific directory that your TeX system searches automatically.
+can install it into your personal TEXMF tree. A personal TEXMF tree is your
+user-specific package directory, and TeX searches it automatically.
 
 This repository includes a TEXMF-ready tree:
 
@@ -368,7 +388,10 @@ upstream `tcolorbox`. Choose it only when the administrator intends
 
 ## If Another Package Loads `tcolorbox`
 
-There are two common cases.
+Some packages and document classes call `\RequirePackage{tcolorbox}` internally.
+In that situation, the result depends on load order.
+
+### If `breakble-tcolorbox` Can Be Loaded First
 
 If you can control the preamble, load `breakble-tcolorbox` before packages that
 use `tcolorbox` internally:
@@ -379,47 +402,60 @@ use `tcolorbox` internally:
 ```
 
 When that later package calls `\RequirePackage{tcolorbox}`, LaTeX sees that
-`tcolorbox` is already loaded. It will use the modified copy that
-`breakble-tcolorbox` loaded.
+`tcolorbox` is already loaded. The later package therefore shares the modified
+runtime loaded by `breakble-tcolorbox`.
 
-The same idea applies to the `drop-in/` method:
+This is true for personal TEXMF, site-wide TEXMF, project-local `TEXINPUTS`, and
+the `drop-in/` method. With `drop-in/`, only the package line changes:
 
 ```tex
 \usepackage[most]{breakble-tcolorbox/breakble-tcolorbox}
 \usepackage{some-package-that-uses-tcolorbox}
 ```
 
-In that case, later packages share the modified `tcolorbox` already loaded by
-the wrapper. So when you can control package order, the `drop-in/` and
-project-local `TEXINPUTS` methods let one document use the modified copy without
-changing the default `tcolorbox` for the whole TeX environment.
+In this arrangement, the modified runtime is used only by that document. The
+default upstream `tcolorbox` remains available to ordinary documents that do not
+load `breakble-tcolorbox`.
 
-If a document class or package loads `tcolorbox` before you have a chance to
-load `breakble-tcolorbox`, the wrapper cannot replace it afterward. In that
-case, changing the load order is the normal fix.
+### If Upstream `tcolorbox` Has Already Been Loaded
+
+If a document class or package loads upstream `tcolorbox` before
+`breakble-tcolorbox`, the wrapper cannot replace it afterward. Silently swapping
+an already-loaded LaTeX package would risk mixing incompatible runtime files.
+
+For that reason, `breakble-tcolorbox` stops instead of continuing in a mixed
+state. The normal fix is to change the preamble or class/package options so
+that `breakble-tcolorbox` is loaded first.
+
+### Last Resort When Load Order Cannot Be Changed
 
 If the load order cannot be changed and you must force the modified copy for one
 document, you can put the development `tcolorbox/` directory before upstream
-`tcolorbox` on TeX's search path. This is an intentional override: ordinary
-`\usepackage{tcolorbox}` will also resolve to the modified copy for that
-compilation. Do not use this as the normal installation method.
+`tcolorbox` on TeX's search path.
+
+This is an intentional override: ordinary `\usepackage{tcolorbox}` will also
+resolve to the modified copy for that compilation. Do not use it as the normal
+personal or site-wide TEXMF installation method. If you use it, limit it to the
+document you are compiling.
 
 ```sh
 TEXINPUTS="/path/to/breakble-tcolorbox/tcolorbox//:" latexmk -pdf main.tex
 ```
 
 When using this override, always confirm the `tcolorbox.sty` path in the `.log`
-file or with `kpsewhich`.
+file or with `kpsewhich`, so that other documents are not accidentally pointed
+at the modified copy.
 
-If a later package loads `tcolorbox` with package options, load a sufficiently
-broad option set early, for example:
+### Avoiding Option Clashes
 
 ```tex
 \usepackage[most]{breakble-tcolorbox}
 ```
 
-This avoids most option-clash situations because `most` loads the usual
-`tcolorbox` libraries.
+If a later package loads `tcolorbox` with package options, LaTeX may report an
+option clash because `tcolorbox` has already been loaded. Load the libraries you
+expect to need when you first load `breakble-tcolorbox`. The `most` option is
+usually enough because it loads the common `tcolorbox` libraries.
 
 ## Status
 
@@ -484,6 +520,12 @@ compile the full manual with both upstream `tcolorbox` and this package, run:
 ```sh
 scripts/check-upstream-manual-parity.py
 ```
+
+That script temporarily places the development `tcolorbox/` directory at the
+front of TeX's search path for verification. The upstream manual sources contain
+ordinary `\usepackage{tcolorbox}` calls, so the script redirects those calls to
+the modified copy only for the parity build. This is not the normal installation
+method.
 
 After the script runs, the main outputs are:
 
