@@ -109,7 +109,7 @@ Text after the nested box.
 cd docs/readme-demo
 TEXINPUTS="$PWD:$PWD/../../vendor/tcolorbox-original//:" \
   latexmk -pdf -outdir=../../build/readme-demo/original nested-breakable-original.tex
-TEXINPUTS="$PWD:$PWD/../..:$PWD/../../tcolorbox//:" \
+TEXINPUTS="$PWD:$PWD/../../texmf/tex/latex//:" \
   latexmk -pdf -outdir=../../build/readme-demo/breakble nested-breakable-breakble.tex
 ```
 
@@ -119,13 +119,16 @@ TEXINPUTS="$PWD:$PWD/../..:$PWD/../../tcolorbox//:" \
 
 - `breakble-tcolorbox.sty`
 
-ただし、コンパイル時には次のディレクトリも必要です。
+コンパイル時には、同じ場所に次の実行時ファイルも必要です。
 
-- `tcolorbox/`
+- `breakble-tcolorbox-runtime.sty`
+- `breakble-tcb*.code.tex`
 
-この `tcolorbox/` ディレクトリは、upstream の実行時ファイルを元にした改変済みコピーです。中には `tcolorbox.sty`、`tcbbreakable.code.tex` や `tcbskins.code.tex` などのライブラリファイル、一部の skin が使う画像ファイルが入っています。
+これらは upstream の `tcolorbox` 実行時ファイルを元にした改変済みコピーです。TEXMF に入れて常用しても、普通の `\usepackage{tcolorbox}` を巻き込まないように、ファイル名は本家の `tcolorbox.sty` や `tcbbreakable.code.tex` とは別名にしています。
 
-`tcolorbox/` は、ユーザーが文書内で直接読み込むものではありません。また、一部のファイルを抜き出して使うのも避けてください。`breakble-tcolorbox.sty` と `tcolorbox/` ディレクトリをセットで使う、という理解で大丈夫です。
+ユーザーが直接読み込むのは `breakble-tcolorbox.sty` だけです。`breakble-tcolorbox-runtime.sty` や `breakble-tcb*.code.tex` は手で読み込まず、同じフォルダに置いておいてください。
+
+このリポジトリには開発・検証用の `tcolorbox/` ディレクトリもあります。これは改変元を追いやすくするための作業用コピーです。TEXMF に入れるときは、リポジトリ全体や `tcolorbox/` をそのまま入れず、後述の `texmf/tex/latex/breakble-tcolorbox/` を使ってください。
 
 文書内では、通常は次を読み込めば使えます。
 
@@ -148,9 +151,9 @@ your-document/
   main.tex
   breakble-tcolorbox/
     breakble-tcolorbox.sty
-    tcolorbox.sty
-    tcbbreakable.code.tex
-    tcbskins.code.tex
+    breakble-tcolorbox-runtime.sty
+    breakble-tcbbreakable.code.tex
+    breakble-tcbskins.code.tex
     ...
 ```
 
@@ -164,42 +167,40 @@ your-document/
 
 ## プロジェクトごとに使う方法
 
-ファイルを手動コピーせず、このリポジトリをそのまま置いて使いたい場合は、コンパイル時にこのリポジトリを TeX の探索パスの先頭に置きます。
+ファイルを手動コピーせず、このリポジトリをそのまま置いて使いたい場合は、配布用 TEXMF ツリーを TeX の探索パスの先頭に置きます。
 
 ```sh
-TEXINPUTS="/path/to/breakble-tcolorbox//:" latexmk -pdf main.tex
+TEXINPUTS="/path/to/breakble-tcolorbox/texmf/tex/latex//:" latexmk -pdf main.tex
 ```
 
 たとえば、文書の隣にこのリポジトリを置いているなら、次のようにできます。
 
 ```sh
-TEXINPUTS="../breakble-tcolorbox//:" latexmk -pdf main.tex
+TEXINPUTS="../breakble-tcolorbox/texmf/tex/latex//:" latexmk -pdf main.tex
 ```
 
-末尾の `//` は重要です。TeX に「このディレクトリ以下を再帰的に探す」と伝えるためのもので、これがないと `tcolorbox/` の中にある実行時ファイルが見つからないことがあります。
+末尾の `//` は重要です。TeX に「このディレクトリ以下を再帰的に探す」と伝えるためのものです。
 
 TeX がどのファイルを見つけるかは、次のように確認できます。
 
 ```sh
-TEXINPUTS="/path/to/breakble-tcolorbox//:" kpsewhich breakble-tcolorbox.sty
-TEXINPUTS="/path/to/breakble-tcolorbox//:" kpsewhich tcolorbox.sty
+TEXINPUTS="/path/to/breakble-tcolorbox/texmf/tex/latex//:" kpsewhich breakble-tcolorbox.sty
+TEXINPUTS="/path/to/breakble-tcolorbox/texmf/tex/latex//:" kpsewhich tcolorbox.sty
 ```
 
-どちらも、このリポジトリ内のパスを指していれば問題ありません。
+`breakble-tcolorbox.sty` はこのリポジトリの `texmf/tex/latex/breakble-tcolorbox/` を指します。一方、`tcolorbox.sty` は通常どおり TeX Live / MacTeX / MiKTeX 側の本家 `tcolorbox` を指すのが期待される状態です。これにより、普通の `\usepackage{tcolorbox}` は本家のまま保てます。
 
-## 高度な方法: 個人用 TEXMF に入れる
+## 個人用 TEXMF に入れる
 
-毎回 `TEXINPUTS` を指定せずに使いたい場合は、個人用の TEXMF ツリーに入れる方法もあります。ただし、元の `tcolorbox` と文書ごとに使い分けたい人には、まず `drop-in/` 方式かプロジェクトごとの `TEXINPUTS` 方式をおすすめします。個人用 TEXMF は「自分の TeX 環境がいつも探しに行く、ユーザー専用の置き場所」です。
+毎回 `TEXINPUTS` を指定せずに使いたい場合は、個人用の TEXMF ツリーに入れるのが扱いやすいです。個人用 TEXMF は「自分の TeX 環境がいつも探しに行く、ユーザー専用の置き場所」です。
 
-注意: この方法では、個人用 TEXMF の中に改変済みの `tcolorbox.sty` を置きます。そのため、TeX の探索順によっては、普通に
+このリポジトリでは、TEXMF に入れるための安全な配置を用意しています。
 
-```tex
-\usepackage{tcolorbox}
+```text
+texmf/tex/latex/breakble-tcolorbox/
 ```
 
-と書いた文書でも、この改変済み `tcolorbox` が本家より先に見つかることがあります。元の `tcolorbox` と `breakble-tcolorbox` を文書ごとに確実に使い分けたい場合は、個人用 TEXMF へ入れるより、`drop-in/` 方式または `TEXINPUTS` を使うプロジェクトごとの方法を選んでください。
-
-要するに、個人用 TEXMF へのインストールは「自分の環境では、この改変済み `tcolorbox` を通常の `tcolorbox` として優先してもよい」と判断できる場合の方法です。
+この中には `tcolorbox.sty` という名前のファイルを入れていません。そのため、通常の `\usepackage{tcolorbox}` は本家 `tcolorbox` を読み続け、`\usepackage{breakble-tcolorbox}` と書いた文書だけが改変版を使う設計です。
 
 まず、個人用 TEXMF の場所を確認します。macOS でも Windows でも、TeX Live / MacTeX を使っているなら次のコマンドが基本です。
 
@@ -219,10 +220,8 @@ kpsewhich -var-value=TEXMFHOME
 
 ```sh
 TEXMFHOME="$(kpsewhich -var-value=TEXMFHOME)"
-mkdir -p "$TEXMFHOME/tex/latex/breakble-tcolorbox"
-
-cp breakble-tcolorbox.sty "$TEXMFHOME/tex/latex/breakble-tcolorbox/"
-cp -R tcolorbox "$TEXMFHOME/tex/latex/breakble-tcolorbox/"
+mkdir -p "$TEXMFHOME/tex/latex"
+cp -R texmf/tex/latex/breakble-tcolorbox "$TEXMFHOME/tex/latex/"
 ```
 
 ### Windows / TeX Live
@@ -231,10 +230,9 @@ PowerShell では次のようにできます。
 
 ```powershell
 $TEXMFHOME = kpsewhich -var-value=TEXMFHOME
-New-Item -ItemType Directory -Force "$TEXMFHOME\tex\latex\breakble-tcolorbox"
+New-Item -ItemType Directory -Force "$TEXMFHOME\tex\latex"
 
-Copy-Item .\breakble-tcolorbox.sty "$TEXMFHOME\tex\latex\breakble-tcolorbox\"
-Copy-Item .\tcolorbox "$TEXMFHOME\tex\latex\breakble-tcolorbox\" -Recurse
+Copy-Item .\texmf\tex\latex\breakble-tcolorbox "$TEXMFHOME\tex\latex\" -Recurse -Force
 ```
 
 ### Windows / MiKTeX
@@ -242,8 +240,8 @@ Copy-Item .\tcolorbox "$TEXMFHOME\tex\latex\breakble-tcolorbox\" -Recurse
 MiKTeX では、TeX Live と同じ `kpsewhich` 方式で分かる場合もありますが、MiKTeX Console でユーザー用の root directory を追加する方が分かりやすいことがあります。
 
 1. 例として `C:\Users\<ユーザー名>\texmf` を作る。
-2. その中に `tex\latex\breakble-tcolorbox` を作る。
-3. `breakble-tcolorbox.sty` と `tcolorbox/` をそこへコピーする。
+2. その中に `tex\latex` を作る。
+3. このリポジトリの `texmf\tex\latex\breakble-tcolorbox` フォルダを、作った `tex\latex` の中へコピーする。
 4. MiKTeX Console でその `texmf` フォルダを root directory として追加する。
 5. MiKTeX Console で file name database を更新する。
 
@@ -269,7 +267,19 @@ kpsewhich breakble-tcolorbox.sty
 kpsewhich tcolorbox.sty
 ```
 
-この方法で入れた場合、`kpsewhich tcolorbox.sty` も `breakble-tcolorbox/tcolorbox/` 以下の改変済みファイルを指すことがあります。これは、ラッパーから改変済みの `tcolorbox.sty` を読み込む形で動くためです。元の `tcolorbox` を常に優先したい環境では、このインストール方法は避けてください。
+`kpsewhich breakble-tcolorbox.sty` は個人用 TEXMF 内の `breakble-tcolorbox` を指していれば成功です。`kpsewhich tcolorbox.sty` は通常どおり TeX Live / MacTeX / MiKTeX 側の本家 `tcolorbox` を指すのが期待される状態です。
+
+つまり、個人用 TEXMF に入れても、普通の
+
+```tex
+\usepackage{tcolorbox}
+```
+
+は本家を読み、次のように書いた文書だけが改変版を使います。
+
+```tex
+\usepackage[most]{breakble-tcolorbox}
+```
 
 より詳しく調べたい場合は、次の語句で検索すると情報にたどり着きやすいです。
 
@@ -280,7 +290,7 @@ kpsewhich tcolorbox.sty
 - `MiKTeX register root update fndb`
 - `mktexlsr texhash 違い`
 
-## 高度な方法: システム全体の TEXMF に入れる
+## システム全体の TEXMF に入れる
 
 共有の TeX Live 環境に入れる場合は、`TEXMFLOCAL` を使います。
 
@@ -288,7 +298,7 @@ kpsewhich tcolorbox.sty
 kpsewhich -var-value=TEXMFLOCAL
 ```
 
-次の場所に、同じく `breakble-tcolorbox.sty` と `tcolorbox/` を置きます。
+次の場所に、個人用 TEXMF と同じく安全な配布用フォルダを置きます。
 
 ```text
 <TEXMFLOCAL>/tex/latex/breakble-tcolorbox/
@@ -298,13 +308,12 @@ kpsewhich -var-value=TEXMFLOCAL
 
 ```sh
 TEXMFLOCAL="$(kpsewhich -var-value=TEXMFLOCAL)"
-sudo mkdir -p "$TEXMFLOCAL/tex/latex/breakble-tcolorbox"
-sudo cp breakble-tcolorbox.sty "$TEXMFLOCAL/tex/latex/breakble-tcolorbox/"
-sudo cp -R tcolorbox "$TEXMFLOCAL/tex/latex/breakble-tcolorbox/"
+sudo mkdir -p "$TEXMFLOCAL/tex/latex"
+sudo cp -R texmf/tex/latex/breakble-tcolorbox "$TEXMFLOCAL/tex/latex/"
 sudo mktexlsr
 ```
 
-ただし、この方法では、その TeX 環境でコンパイルする文書に対して、改変済み `tcolorbox` が本家より先に見つかる可能性があります。つまり、普通の `\usepackage{tcolorbox}` でも改変版が使われることがあります。環境全体に影響するため、チームや端末全体でこの挙動を使いたい場合に選んでください。元の `tcolorbox` と併用したい場合は、この方法はおすすめしません。
+システム全体に入れる場合も、通常の `\usepackage{tcolorbox}` は本家 `tcolorbox` を読み続ける設計です。ただし、共有環境では他の利用者にも `breakble-tcolorbox` が見えるようになるため、管理者が意図している場合に選んでください。
 
 ## 別パッケージの内部で `tcolorbox` が読み込まれる場合
 
@@ -328,17 +337,15 @@ sudo mktexlsr
 
 この場合も、後から読み込まれるパッケージは改変済み `tcolorbox` を共有します。つまり、順番を調整できる文書では、`drop-in/` 方式や `TEXINPUTS` 方式を使えば、環境全体の普通の `tcolorbox` を置き換えず、その文書では改変版を使えます。
 
-一方で、文書クラスやパッケージがプリアンブルより前、または `breakble-tcolorbox` より前に `tcolorbox` を読み込んでしまう場合、あとからラッパーで差し替えることはできません。その場合、その文書でどうしても改変版を使いたいなら、このリポジトリの `tcolorbox/` を本家 `tcolorbox` より先に TeX の探索パスへ置き、ラッパーは後から読み込まないでください。
+一方で、文書クラスやパッケージがプリアンブルより前、または `breakble-tcolorbox` より前に `tcolorbox` を読み込んでしまう場合、あとからラッパーで差し替えることはできません。この場合は読み込み順を変えるのが基本です。
+
+どうしても読み込み順を変えられず、その文書だけで改変版を強制したい場合は、開発用の `tcolorbox/` を本家より先に TeX の探索パスへ置く方法もあります。ただしこれは通常の `\usepackage{tcolorbox}` も改変版へ向ける意図的な上書きです。常用のインストール方法としては使わないでください。
 
 ```sh
 TEXINPUTS="/path/to/breakble-tcolorbox/tcolorbox//:" latexmk -pdf main.tex
 ```
 
-これにより、そのコンパイルでは、内部の `\RequirePackage{tcolorbox}` が改変済みの実行時ファイルを直接見つけます。次のコマンドや `.log` ファイルで、どの `tcolorbox.sty` が読まれているか確認してください。
-
-```sh
-TEXINPUTS="/path/to/breakble-tcolorbox/tcolorbox//:" kpsewhich tcolorbox.sty
-```
+この上書き方式を使うときは、`.log` ファイルや `kpsewhich` で、どの `tcolorbox.sty` が読まれているか必ず確認してください。
 
 また、後から読み込まれるパッケージが `tcolorbox` にオプションを渡す場合は、必要になりそうなライブラリを先に読み込んでおくと option clash を避けやすくなります。
 
@@ -447,13 +454,16 @@ scripts/run-full-verification.sh
 ## リポジトリ構成
 
 - `breakble-tcolorbox.sty`: 文書から読み込む公開用ラッパーパッケージ
-- `tcolorbox/`: ラッパーが読み込む改変済み実行時ファイル
+- `breakble-tcolorbox-runtime.sty`, `breakble-tcb*.code.tex`: 本家と同名にならないようにした改変済み実行時ファイル
+- `texmf/tex/latex/breakble-tcolorbox/`: 個人用 TEXMF やシステム TEXMF へコピーする配布用フォルダ
+- `tcolorbox/`: 開発・検証用の改変済み upstream 実行時ファイル
 - `vendor/tcolorbox-original/`: parity check 用の未改変 upstream 実行時ファイル
 - `docs/nested-breakable-requirements.md`: nested breakable 挙動について開発中に固めた要件
 - `docs/tcolorbox/`: parity check に使う upstream documentation、standalone example sources、assets
 - `docs/readme-demo/`: README の比較画像に使う A4 サンプル
 - `docs/samples/`: タイトルなし入れ子などの追加サンプル
 - `drop-in/`: `.tex` と同じ階層へフォルダごとコピーして使うためのファイル一式
+- `scripts/build-safe-runtime-tree.py`: `tcolorbox/` から同名衝突を避ける配布用 runtime を生成するスクリプト
 - `verification/example-parity/`: 生成済み parity report、source copies、side-by-side PDFs
 - `verification/nested-behavior/`: nested breakable の確認用レポートと PDF
 - `verification/manual-parity/`: 生成される manual parity report、source copies、rendered pages、side-by-side PDF

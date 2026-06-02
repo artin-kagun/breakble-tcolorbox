@@ -23,9 +23,25 @@
   \edef\tcbpkgprefix{\breakbletcb@path}%
 \fi
 \ifx\breakbletcb@path\@empty
-  \RequirePackage{tcolorbox}%
+  \def\breakbletcb@runtime{breakble-tcolorbox-runtime.sty}%
 \else
-  \RequirePackage{\breakbletcb@path tcolorbox}%
+  \edef\breakbletcb@runtime{\breakbletcb@path breakble-tcolorbox-runtime.sty}%
 \fi
+\let\breakbletcb@saved@currname\@currname
+\let\breakbletcb@saved@currext\@currext
+\let\breakbletcb@saved@currpath\@currpath
+\def\@currpath{}%
+\def\@currname{tcolorbox}%
+\def\@currext{sty}%
+\makeatletter
+\input\breakbletcb@runtime\relax
+\let\@currpath\breakbletcb@saved@currpath
+\let\@currext\breakbletcb@saved@currext
+\let\@currname\breakbletcb@saved@currname
+\@ifpackageloaded{tcolorbox}{}{%
+  \PackageError{breakble-tcolorbox}{breakble-tcolorbox runtime did not register tcolorbox}{%
+    The runtime file should provide the package name tcolorbox.%
+  }%
+}%
 \makeatother
 \endinput

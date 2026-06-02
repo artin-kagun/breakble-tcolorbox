@@ -1,5 +1,5 @@
 %% The LaTeX package tcolorbox - version 6.10.0 (2026/05/28)
-%% tcblistingsutf8.code.tex: Code for colorboxes with listings in UTF-8
+%% tcbxparse.code.tex: Code for xparse features
 %%
 %% -------------------------------------------------------------------------------------------
 %% Copyright (c) 2006-2026 by Prof. Dr. Dr. Thomas F. Sturm <thomas dot sturm at unibw dot de>
@@ -17,28 +17,7 @@
 %%
 %% This work consists of all files listed in README
 %%
+%\makeatletter
 \tcb@set@library@version{6.10.0}
 
-\tcbuselibrary{listings}
-
-\RequirePackage{iftex}
-\ifpdftex
-  \let\tcb@temp\relax%
-\else
-  \tcb@info{Library `listingsutf8' is compatible with pdftex only.
-            Library `listings` is loaded instead.}%
-  \let\tcb@temp\endinput
-\fi
-\tcb@temp
-
-\RequirePackage{listingsutf8}[2011/11/10]
-
-\tcbset{
-  listing utf8/.style={listing inputencoding=utf8/#1},
-}
-
-\tcbset{%
-  reset@listingsutf8/.style={listing utf8=latin1},
-  initialize@reset=reset@listingsutf8,
-}
-
+\RequirePackage{xparse}[2013/12/31]

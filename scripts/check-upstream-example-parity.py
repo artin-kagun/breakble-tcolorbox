@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DOC_DIR = ROOT / "docs" / "tcolorbox"
 BUILD_DIR = ROOT / "verification" / "example-parity"
 ORIGINAL_INPUTS = f"{ROOT / 'vendor' / 'tcolorbox-original'}//:"
-BREAKBLE_INPUTS = f"{ROOT}//:"
+BREAKBLE_INPUTS = f"{ROOT}:"
 USEPACKAGE_TCOLORBOX = re.compile(r"\\usepackage(\s*(?:\[[^\]]*\])?\s*)\{tcolorbox\}")
 
 

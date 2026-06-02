@@ -12,6 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 DOC_DIR = ROOT / "docs" / "tcolorbox"
 BUILD_DIR = ROOT / "verification" / "manual-parity"
 ORIGINAL_INPUTS = f".:{ROOT / 'vendor' / 'tcolorbox-original'}//:"
+# The upstream manual generates child documents that literally contain
+# \usepackage{tcolorbox}.  For parity, those child runs must see the same
+# modified 6.10.0 runtime, so the development tcolorbox/ override is included
+# here intentionally.  The public TEXMF installation remains shadow-safe.
 BREAKBLE_INPUTS = f".:{ROOT}:{ROOT / 'tcolorbox'}//:"
 MAIN_TEX = "tcolorbox.tex"
 S_MAIN_PACKAGE_LOAD = r"\RequirePackage{\tcbpkgprefix tcolorbox}"

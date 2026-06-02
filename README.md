@@ -123,7 +123,7 @@ To rebuild the two demo PDFs from this repository root:
 cd docs/readme-demo
 TEXINPUTS="$PWD:$PWD/../../vendor/tcolorbox-original//:" \
   latexmk -pdf -outdir=../../build/readme-demo/original nested-breakable-original.tex
-TEXINPUTS="$PWD:$PWD/../..:$PWD/../../tcolorbox//:" \
+TEXINPUTS="$PWD:$PWD/../../texmf/tex/latex//:" \
   latexmk -pdf -outdir=../../build/readme-demo/breakble nested-breakable-breakble.tex
 ```
 
@@ -133,15 +133,25 @@ For normal use, the user-facing entry point is:
 
 - `breakble-tcolorbox.sty`
 
-The directory below is also required at compile time:
+The following runtime files are also required in the same directory:
 
-- `tcolorbox/`
+- `breakble-tcolorbox-runtime.sty`
+- `breakble-tcb*.code.tex`
 
-That `tcolorbox/` directory is a modified copy of upstream runtime files. It
-contains `tcolorbox.sty`, library files such as `tcbbreakable.code.tex` and
-`tcbskins.code.tex`, and image assets used by some skins. It is not a separate
-package that you load by hand, and it should be kept together with
-`breakble-tcolorbox.sty`.
+Those files are modified copies of upstream `tcolorbox` runtime files. Their
+filenames are intentionally different from upstream filenames such as
+`tcolorbox.sty` and `tcbbreakable.code.tex`. This allows the package to be
+installed in a TEXMF tree while ordinary `\usepackage{tcolorbox}` continues to
+find the upstream package.
+
+The only file a document loads directly is `breakble-tcolorbox.sty`. Do not load
+`breakble-tcolorbox-runtime.sty` or the `breakble-tcb*.code.tex` files by hand;
+keep them next to the wrapper.
+
+This repository also contains a development and verification copy named
+`tcolorbox/`. Do not install the whole repository or that `tcolorbox/` directory
+into a TEXMF tree. For TEXMF installation, use
+`texmf/tex/latex/breakble-tcolorbox/`.
 
 In a document, load:
 
@@ -149,7 +159,7 @@ In a document, load:
 \usepackage[most]{breakble-tcolorbox}
 ```
 
-Do not load `tcolorbox/` directly. The wrapper loads the modified runtime files.
+Do not load the runtime files directly. The wrapper loads them.
 
 ## Manual Copy Installation
 
@@ -168,9 +178,9 @@ your-document/
   main.tex
   breakble-tcolorbox/
     breakble-tcolorbox.sty
-    tcolorbox.sty
-    tcbbreakable.code.tex
-    tcbskins.code.tex
+    breakble-tcolorbox-runtime.sty
+    breakble-tcbbreakable.code.tex
+    breakble-tcbskins.code.tex
     ...
 ```
 
@@ -186,56 +196,50 @@ trying the package in one project.
 ## Project-Local Installation
 
 If you want to keep this repository intact instead of copying the files by
-hand, put this repository at the front of TeX's input path when compiling.
+hand, put the packaged TEXMF tree at the front of TeX's input path when
+compiling.
 
-Keep this repository somewhere on disk, then compile your document with this
-repository at the front of TeX's input path:
+Keep this repository somewhere on disk, then compile your document with:
 
 ```sh
-TEXINPUTS="/path/to/breakble-tcolorbox//:" latexmk -pdf main.tex
+TEXINPUTS="/path/to/breakble-tcolorbox/texmf/tex/latex//:" latexmk -pdf main.tex
 ```
 
 For example, if this repository is next to your document:
 
 ```sh
-TEXINPUTS="../breakble-tcolorbox//:" latexmk -pdf main.tex
+TEXINPUTS="../breakble-tcolorbox/texmf/tex/latex//:" latexmk -pdf main.tex
 ```
 
-The `//` is important: it tells TeX to search the repository recursively, so it
-can find both `breakble-tcolorbox.sty` and the files inside `tcolorbox/`.
+The `//` is important: it tells TeX to search that directory recursively.
 
 You can verify what TeX will find with:
 
 ```sh
-TEXINPUTS="/path/to/breakble-tcolorbox//:" kpsewhich breakble-tcolorbox.sty
-TEXINPUTS="/path/to/breakble-tcolorbox//:" kpsewhich tcolorbox.sty
+TEXINPUTS="/path/to/breakble-tcolorbox/texmf/tex/latex//:" kpsewhich breakble-tcolorbox.sty
+TEXINPUTS="/path/to/breakble-tcolorbox/texmf/tex/latex//:" kpsewhich tcolorbox.sty
 ```
 
-Both paths should point into this repository.
+`breakble-tcolorbox.sty` should point into this repository's
+`texmf/tex/latex/breakble-tcolorbox/` directory. `tcolorbox.sty` should normally
+continue to point to upstream `tcolorbox` from TeX Live, MacTeX, or MiKTeX.
 
-## Advanced: Personal TEXMF Installation
+## Personal TEXMF Installation
 
 If you want TeX to find the package without setting `TEXINPUTS` every time, you
-can install it into your personal TEXMF tree. However, if you want to choose
-between upstream `tcolorbox` and this package document by document, prefer the
-`drop-in/` method or the project-local `TEXINPUTS` method. A personal TEXMF tree
-is the user-specific directory that your TeX system searches automatically.
+can install it into your personal TEXMF tree. A personal TEXMF tree is the
+user-specific directory that your TeX system searches automatically.
 
-Important: this method puts a modified `tcolorbox.sty` into your personal TEXMF
-tree. Depending on TeX's search order, a document that simply says
+This repository includes a TEXMF-ready tree:
 
-```tex
-\usepackage{tcolorbox}
+```text
+texmf/tex/latex/breakble-tcolorbox/
 ```
 
-may find this modified copy before the upstream copy. If you want to choose
-between upstream `tcolorbox` and `breakble-tcolorbox` on a document-by-document
-basis, prefer the `drop-in/` method or the project-local `TEXINPUTS` method
-instead of installing into your personal TEXMF tree.
-
-In short, use a personal TEXMF installation only when you are comfortable with
-this modified copy being preferred as the normal `tcolorbox` in your own TeX
-environment.
+That directory intentionally does not contain a file named `tcolorbox.sty`.
+Therefore ordinary `\usepackage{tcolorbox}` continues to load upstream
+`tcolorbox`, while documents that say `\usepackage{breakble-tcolorbox}` use the
+modified runtime.
 
 First, find your personal TEXMF root. For TeX Live and MacTeX, this command is
 the usual starting point on both macOS and Windows:
@@ -258,10 +262,8 @@ Always prefer the value printed by `kpsewhich` on your own machine.
 
 ```sh
 TEXMFHOME="$(kpsewhich -var-value=TEXMFHOME)"
-mkdir -p "$TEXMFHOME/tex/latex/breakble-tcolorbox"
-
-cp breakble-tcolorbox.sty "$TEXMFHOME/tex/latex/breakble-tcolorbox/"
-cp -R tcolorbox "$TEXMFHOME/tex/latex/breakble-tcolorbox/"
+mkdir -p "$TEXMFHOME/tex/latex"
+cp -R texmf/tex/latex/breakble-tcolorbox "$TEXMFHOME/tex/latex/"
 ```
 
 ### Windows / TeX Live
@@ -270,10 +272,9 @@ In PowerShell:
 
 ```powershell
 $TEXMFHOME = kpsewhich -var-value=TEXMFHOME
-New-Item -ItemType Directory -Force "$TEXMFHOME\tex\latex\breakble-tcolorbox"
+New-Item -ItemType Directory -Force "$TEXMFHOME\tex\latex"
 
-Copy-Item .\breakble-tcolorbox.sty "$TEXMFHOME\tex\latex\breakble-tcolorbox\"
-Copy-Item .\tcolorbox "$TEXMFHOME\tex\latex\breakble-tcolorbox\" -Recurse
+Copy-Item .\texmf\tex\latex\breakble-tcolorbox "$TEXMFHOME\tex\latex\" -Recurse -Force
 ```
 
 ### Windows / MiKTeX
@@ -282,8 +283,9 @@ MiKTeX may also provide `kpsewhich`, but many users manage user TEXMF roots
 through MiKTeX Console.
 
 1. Create a directory such as `C:\Users\<username>\texmf`.
-2. Inside it, create `tex\latex\breakble-tcolorbox`.
-3. Copy `breakble-tcolorbox.sty` and `tcolorbox/` into that directory.
+2. Inside it, create `tex\latex`.
+3. Copy this repository's `texmf\tex\latex\breakble-tcolorbox` directory into
+   that `tex\latex` directory.
 4. In MiKTeX Console, add the `texmf` directory as a root directory.
 5. Refresh the file name database.
 
@@ -310,11 +312,23 @@ kpsewhich breakble-tcolorbox.sty
 kpsewhich tcolorbox.sty
 ```
 
-When this package is installed this way, `kpsewhich tcolorbox.sty` may also
-point to the modified copy under `breakble-tcolorbox/tcolorbox/`. That can be
-expected because the wrapper works by loading a modified `tcolorbox.sty`. Avoid
-this installation method if your environment should always prefer upstream
+`kpsewhich breakble-tcolorbox.sty` should point into your personal TEXMF tree.
+`kpsewhich tcolorbox.sty` should normally continue to point to upstream
 `tcolorbox`.
+
+In other words, after this installation, ordinary
+
+```tex
+\usepackage{tcolorbox}
+```
+
+loads upstream `tcolorbox`, and only documents that say
+
+```tex
+\usepackage[most]{breakble-tcolorbox}
+```
+
+use this modified runtime.
 
 Useful search terms:
 
@@ -325,7 +339,7 @@ Useful search terms:
 - `MiKTeX register root update fndb`
 - `mktexlsr texhash difference`
 
-## Advanced: Site-Wide TEXMF Installation
+## Site-Wide TEXMF Installation
 
 For a shared TeX Live installation, use `TEXMFLOCAL`:
 
@@ -333,7 +347,7 @@ For a shared TeX Live installation, use `TEXMFLOCAL`:
 kpsewhich -var-value=TEXMFLOCAL
 ```
 
-Then copy the same two items into:
+Then copy the TEXMF-ready directory into:
 
 ```text
 <TEXMFLOCAL>/tex/latex/breakble-tcolorbox/
@@ -343,17 +357,14 @@ For example:
 
 ```sh
 TEXMFLOCAL="$(kpsewhich -var-value=TEXMFLOCAL)"
-sudo mkdir -p "$TEXMFLOCAL/tex/latex/breakble-tcolorbox"
-sudo cp breakble-tcolorbox.sty "$TEXMFLOCAL/tex/latex/breakble-tcolorbox/"
-sudo cp -R tcolorbox "$TEXMFLOCAL/tex/latex/breakble-tcolorbox/"
+sudo mkdir -p "$TEXMFLOCAL/tex/latex"
+sudo cp -R texmf/tex/latex/breakble-tcolorbox "$TEXMFLOCAL/tex/latex/"
 sudo mktexlsr
 ```
 
-Choose a site-wide install when you want this modified `tcolorbox` to be found
-before the upstream copy for documents compiled in that TeX installation. In
-other words, ordinary `\usepackage{tcolorbox}` may also use the modified copy.
-Do not use this method if you need to keep upstream `tcolorbox` available as the
-default in the same TeX installation.
+A site-wide install also keeps ordinary `\usepackage{tcolorbox}` pointing to
+upstream `tcolorbox`. Choose it only when the administrator intends
+`breakble-tcolorbox` to be available to all users of that TeX installation.
 
 ## If Another Package Loads `tcolorbox`
 
@@ -384,20 +395,21 @@ project-local `TEXINPUTS` methods let one document use the modified copy without
 changing the default `tcolorbox` for the whole TeX environment.
 
 If a document class or package loads `tcolorbox` before you have a chance to
-load `breakble-tcolorbox`, the wrapper cannot replace it afterward. If you still
-need the modified copy for that document, put this repository before the system
-`tcolorbox` on TeX's search path and do not load the wrapper later:
+load `breakble-tcolorbox`, the wrapper cannot replace it afterward. In that
+case, changing the load order is the normal fix.
+
+If the load order cannot be changed and you must force the modified copy for one
+document, you can put the development `tcolorbox/` directory before upstream
+`tcolorbox` on TeX's search path. This is an intentional override: ordinary
+`\usepackage{tcolorbox}` will also resolve to the modified copy for that
+compilation. Do not use this as the normal installation method.
 
 ```sh
 TEXINPUTS="/path/to/breakble-tcolorbox/tcolorbox//:" latexmk -pdf main.tex
 ```
 
-For that compilation, a direct internal `\RequirePackage{tcolorbox}` will
-resolve to the modified runtime copy. Confirm this in the `.log` file or with:
-
-```sh
-TEXINPUTS="/path/to/breakble-tcolorbox/tcolorbox//:" kpsewhich tcolorbox.sty
-```
+When using this override, always confirm the `tcolorbox.sty` path in the `.log`
+file or with `kpsewhich`.
 
 If a later package loads `tcolorbox` with package options, load a sufficiently
 broad option set early, for example:
@@ -520,7 +532,12 @@ for the current run.
 ## Repository Layout
 
 - `breakble-tcolorbox.sty`: public wrapper package
-- `tcolorbox/`: modified runtime package files used by the wrapper
+- `breakble-tcolorbox-runtime.sty`, `breakble-tcb*.code.tex`: modified runtime
+  files renamed to avoid upstream filename shadowing
+- `texmf/tex/latex/breakble-tcolorbox/`: copy-ready directory for personal or
+  site-wide TEXMF installation
+- `tcolorbox/`: development and verification copy of the modified upstream
+  runtime files
 - `vendor/tcolorbox-original/`: unmodified upstream runtime files used for parity checks
 - `docs/nested-breakable-requirements.md`: development requirements for nested
   breakable behavior
@@ -528,6 +545,8 @@ for the current run.
 - `docs/readme-demo/`: A4 sample used for the README comparison image
 - `docs/samples/`: additional samples, including titleless nested boxes
 - `drop-in/`: copy-ready folder for manual use next to a `.tex` file
+- `scripts/build-safe-runtime-tree.py`: regenerates the renamed runtime files
+  from `tcolorbox/`
 - `verification/example-parity/`: generated parity report, source copies, and side-by-side PDFs
 - `verification/nested-behavior/`: generated nested-breakable behavior reports and PDFs
 - `verification/manual-parity/`: generated manual parity report, source copies, rendered pages, and side-by-side PDF
