@@ -189,21 +189,23 @@ TEXINPUTS="/path/to/breakble-tcolorbox//:" kpsewhich tcolorbox.sty
 
 ## 個人用 TEXMF に入れる方法
 
-毎回 `TEXINPUTS` を指定せずに使いたい場合は、個人用の TEXMF ツリーに入れます。
+毎回 `TEXINPUTS` を指定せずに使いたい場合は、個人用の TEXMF ツリーに入れます。分からない場合は、先に `drop-in/` の手動コピー方式で試すのがおすすめです。個人用 TEXMF は「自分の TeX 環境がいつも探しに行く、ユーザー専用の置き場所」です。
 
-まず、個人用 TEXMF の場所を確認します。
+まず、個人用 TEXMF の場所を確認します。macOS でも Windows でも、TeX Live / MacTeX を使っているなら次のコマンドが基本です。
 
 ```sh
 kpsewhich -var-value=TEXMFHOME
 ```
 
-MacTeX では、よく次の場所になります。
+よくある場所は次のとおりです。実際の場所は必ず上の `kpsewhich` で確認してください。
 
-```text
-~/Library/texmf
-```
+| 環境 | よくある `TEXMFHOME` |
+| --- | --- |
+| macOS / MacTeX | `~/Library/texmf` |
+| Linux / TeX Live | `~/texmf` |
+| Windows / TeX Live | `C:\Users\<ユーザー名>\texmf` |
 
-次のようにディレクトリを作り、必要なものをコピーします。
+### macOS / Linux / TeX Live
 
 ```sh
 TEXMFHOME="$(kpsewhich -var-value=TEXMFHOME)"
@@ -213,7 +215,38 @@ cp breakble-tcolorbox.sty "$TEXMFHOME/tex/latex/breakble-tcolorbox/"
 cp -R tcolorbox "$TEXMFHOME/tex/latex/breakble-tcolorbox/"
 ```
 
-`TEXMFHOME` では、通常はファイル名データベースの更新なしで見つかります。もし TeX が見つけてくれない場合は、次を実行してください。
+### Windows / TeX Live
+
+PowerShell では次のようにできます。
+
+```powershell
+$TEXMFHOME = kpsewhich -var-value=TEXMFHOME
+New-Item -ItemType Directory -Force "$TEXMFHOME\tex\latex\breakble-tcolorbox"
+
+Copy-Item .\breakble-tcolorbox.sty "$TEXMFHOME\tex\latex\breakble-tcolorbox\"
+Copy-Item .\tcolorbox "$TEXMFHOME\tex\latex\breakble-tcolorbox\" -Recurse
+```
+
+### Windows / MiKTeX
+
+MiKTeX では、TeX Live と同じ `kpsewhich` 方式で分かる場合もありますが、MiKTeX Console でユーザー用の root directory を追加する方が分かりやすいことがあります。
+
+1. 例として `C:\Users\<ユーザー名>\texmf` を作る。
+2. その中に `tex\latex\breakble-tcolorbox` を作る。
+3. `breakble-tcolorbox.sty` と `tcolorbox/` をそこへコピーする。
+4. MiKTeX Console でその `texmf` フォルダを root directory として追加する。
+5. MiKTeX Console で file name database を更新する。
+
+コマンドで行う場合は、環境によって次のような操作になります。
+
+```powershell
+initexmf --register-root=C:\Users\<ユーザー名>\texmf
+initexmf --update-fndb
+```
+
+### 確認
+
+`TEXMFHOME` では、TeX Live なら通常はファイル名データベースの更新なしで見つかります。もし TeX が見つけてくれない場合は、次を実行してください。
 
 ```sh
 mktexlsr "$TEXMFHOME"
@@ -227,6 +260,15 @@ kpsewhich tcolorbox.sty
 ```
 
 この方法で入れた場合、`kpsewhich tcolorbox.sty` も `breakble-tcolorbox/tcolorbox/` 以下の改変済みファイルを指すのが期待される状態です。このパッケージは、ラッパーから改変済みの `tcolorbox.sty` を読み込む形で動くためです。
+
+より詳しく調べたい場合は、次の語句で検索すると情報にたどり着きやすいです。
+
+- `TeX Live TEXMFHOME`
+- `MacTeX TEXMFHOME Library texmf`
+- `Windows TeX Live TEXMFHOME kpsewhich`
+- `MiKTeX local texmf root`
+- `MiKTeX register root update fndb`
+- `mktexlsr texhash 違い`
 
 ## システム全体の TEXMF に入れる方法
 

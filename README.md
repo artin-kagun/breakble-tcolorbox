@@ -216,21 +216,28 @@ Both paths should point into this repository.
 ## Personal TEXMF Installation
 
 If you want TeX to find the package without setting `TEXINPUTS` every time,
-install it into your personal TEXMF tree.
+install it into your personal TEXMF tree. If this is unfamiliar, try the
+`drop-in/` method first. A personal TEXMF tree is the user-specific directory
+that your TeX system searches automatically.
 
-Find the personal TEXMF root:
+First, find your personal TEXMF root. For TeX Live and MacTeX, this command is
+the usual starting point on both macOS and Windows:
 
 ```sh
 kpsewhich -var-value=TEXMFHOME
 ```
 
-On MacTeX this is commonly:
+Common locations are:
 
-```text
-~/Library/texmf
-```
+| Environment | Common `TEXMFHOME` |
+| --- | --- |
+| macOS / MacTeX | `~/Library/texmf` |
+| Linux / TeX Live | `~/texmf` |
+| Windows / TeX Live | `C:\Users\<username>\texmf` |
 
-Create a package directory and copy the runtime files:
+Always prefer the value printed by `kpsewhich` on your own machine.
+
+### macOS / Linux / TeX Live
 
 ```sh
 TEXMFHOME="$(kpsewhich -var-value=TEXMFHOME)"
@@ -239,6 +246,38 @@ mkdir -p "$TEXMFHOME/tex/latex/breakble-tcolorbox"
 cp breakble-tcolorbox.sty "$TEXMFHOME/tex/latex/breakble-tcolorbox/"
 cp -R tcolorbox "$TEXMFHOME/tex/latex/breakble-tcolorbox/"
 ```
+
+### Windows / TeX Live
+
+In PowerShell:
+
+```powershell
+$TEXMFHOME = kpsewhich -var-value=TEXMFHOME
+New-Item -ItemType Directory -Force "$TEXMFHOME\tex\latex\breakble-tcolorbox"
+
+Copy-Item .\breakble-tcolorbox.sty "$TEXMFHOME\tex\latex\breakble-tcolorbox\"
+Copy-Item .\tcolorbox "$TEXMFHOME\tex\latex\breakble-tcolorbox\" -Recurse
+```
+
+### Windows / MiKTeX
+
+MiKTeX may also provide `kpsewhich`, but many users manage user TEXMF roots
+through MiKTeX Console.
+
+1. Create a directory such as `C:\Users\<username>\texmf`.
+2. Inside it, create `tex\latex\breakble-tcolorbox`.
+3. Copy `breakble-tcolorbox.sty` and `tcolorbox/` into that directory.
+4. In MiKTeX Console, add the `texmf` directory as a root directory.
+5. Refresh the file name database.
+
+Command-line equivalents often look like:
+
+```powershell
+initexmf --register-root=C:\Users\<username>\texmf
+initexmf --update-fndb
+```
+
+### Check The Installation
 
 For `TEXMFHOME`, TeX Live usually notices files without rebuilding a filename
 database. If TeX does not find the package, run:
@@ -257,6 +296,15 @@ kpsewhich tcolorbox.sty
 When this package is installed this way, `kpsewhich tcolorbox.sty` should also
 point to the modified copy under `breakble-tcolorbox/tcolorbox/`. This is
 expected: the wrapper works by loading a modified `tcolorbox.sty`.
+
+Useful search terms:
+
+- `TeX Live TEXMFHOME`
+- `MacTeX TEXMFHOME Library texmf`
+- `Windows TeX Live TEXMFHOME kpsewhich`
+- `MiKTeX local texmf root`
+- `MiKTeX register root update fndb`
+- `mktexlsr texhash difference`
 
 ## Site-Wide TEXMF Installation
 
