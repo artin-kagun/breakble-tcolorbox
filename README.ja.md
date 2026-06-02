@@ -133,9 +133,37 @@ TEXINPUTS="$PWD:$PWD/../..:$PWD/../../tcolorbox//:" \
 \usepackage[most]{breakble-tcolorbox}
 ```
 
+## 手動コピーで試す方法
+
+TeX の探索パスを設定せずに試したい場合は、次のフォルダを使ってください。
+
+- `drop-in/`
+
+`drop-in/` の中には、`breakble-tcolorbox.sty` と、改造済み `tcolorbox` の実行時ファイルを同じ階層にまとめてあります。このフォルダの中身を、コンパイルしたい `.tex` ファイルと同じ階層へコピーしてください。
+
+たとえば、次のような配置にします。
+
+```text
+your-document/
+  main.tex
+  breakble-tcolorbox.sty
+  tcolorbox.sty
+  tcbbreakable.code.tex
+  tcbskins.code.tex
+  ...
+```
+
+この配置なら、文書側では通常どおり次の読み込みで使えます。
+
+```tex
+\usepackage[most]{breakble-tcolorbox}
+```
+
+この方法では、`TEXINPUTS` や `mktexlsr` は不要です。試用や、特定のプロジェクトで使いたい場合に向いています。
+
 ## プロジェクトごとに使う方法
 
-まず試すなら、この方法が扱いやすいです。コンパイル時に、このリポジトリを TeX の探索パスの先頭に置きます。
+ファイルを手動コピーせず、このリポジトリをそのまま置いて使いたい場合は、コンパイル時にこのリポジトリを TeX の探索パスの先頭に置きます。
 
 ```sh
 TEXINPUTS="/path/to/breakble-tcolorbox//:" latexmk -pdf main.tex
@@ -363,6 +391,7 @@ scripts/run-full-verification.sh
 - `docs/tcolorbox/`: parity check に使う upstream documentation、standalone example sources、assets
 - `docs/readme-demo/`: README の比較画像に使う A4 サンプル
 - `docs/samples/`: タイトルなし入れ子などの追加サンプル
+- `drop-in/`: `.tex` と同じ階層へコピーして使うための平置き用ファイル一式
 - `verification/example-parity/`: 生成済み parity report、source copies、side-by-side PDFs
 - `verification/nested-behavior/`: nested breakable の確認用レポートと PDF
 - `verification/manual-parity/`: 生成される manual parity report、source copies、rendered pages、side-by-side PDF
