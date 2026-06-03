@@ -40,16 +40,16 @@ def include_page(pdf: str, page: int, total_pages: int, missing_label: str) -> s
 
 def write_comparison_tex(
     original_pdf: Path,
-    patched_pdf: Path,
+    breakble_pdf: Path,
     out_dir: Path,
     stem: str,
     original_pages: int,
-    patched_pages: int,
+    breakble_pages: int,
 ) -> Path:
     tex = out_dir / f"{stem}.tex"
     original = latex_path(original_pdf)
-    patched = latex_path(patched_pdf)
-    pages = max(original_pages, patched_pages)
+    breakble = latex_path(breakble_pdf)
+    pages = max(original_pages, breakble_pages)
     parts = [
         r"\documentclass[a4paper,landscape]{article}",
         r"\usepackage[margin=8mm]{geometry}",
@@ -64,15 +64,15 @@ def write_comparison_tex(
     for page in range(1, pages + 1):
         parts.extend(
             [
-                rf"\noindent\textbf{{A4 comparison page {page}: original left, patched right}}\par\smallskip",
+                rf"\noindent\textbf{{A4 comparison page {page}: original left, breakble right}}\par\smallskip",
                 r"\noindent",
                 r"\begin{minipage}[t]{0.492\linewidth}\centering",
                 r"\textbf{Original tcolorbox}\par\smallskip",
                 include_page(original, page, original_pages, "Original tcolorbox"),
                 r"\end{minipage}\hfill",
                 r"\begin{minipage}[t]{0.492\linewidth}\centering",
-                r"\textbf{Patched tcolorbox}\par\smallskip",
-                include_page(patched, page, patched_pages, "Patched tcolorbox"),
+                r"\textbf{breakble-tcolorbox}\par\smallskip",
+                include_page(breakble, page, breakble_pages, "breakble-tcolorbox"),
                 r"\end{minipage}",
             ]
         )
@@ -93,27 +93,27 @@ def check_log(log: Path) -> None:
 def main() -> int:
     if len(sys.argv) != 4:
         print(
-            "usage: make-a4-side-by-side-comparison.py ORIGINAL.pdf PATCHED.pdf OUT_DIR",
+            "usage: make-a4-side-by-side-comparison.py ORIGINAL.pdf BREAKBLE.pdf OUT_DIR",
             file=sys.stderr,
         )
         return 2
 
     original_pdf = Path(sys.argv[1])
-    patched_pdf = Path(sys.argv[2])
+    breakble_pdf = Path(sys.argv[2])
     out_dir = Path(sys.argv[3])
     out_dir.mkdir(parents=True, exist_ok=True)
 
     original_pages = pdf_pages(original_pdf)
-    patched_pages = pdf_pages(patched_pdf)
+    breakble_pages = pdf_pages(breakble_pdf)
 
     stem = original_pdf.stem + "-side-by-side"
     tex = write_comparison_tex(
         original_pdf,
-        patched_pdf,
+        breakble_pdf,
         out_dir,
         stem,
         original_pages,
-        patched_pages,
+        breakble_pages,
     )
     subprocess.check_call(
         [

@@ -147,6 +147,11 @@
     \fi%
     \tcbdimto\tcb@h@page{\tcb@h@page+\tcb@breakat@dim-\kvtcb@shrinkbreakgoal}%
   \fi%
+  \tcb@if@contains@nested@breakable{%
+    \ifdim\tcb@h@page<\dimexpr\kvtcb@breakminlines\baselineskip+\tcb@h@padtitle+\kvtcb@boxsep*2+\kvtcb@top+\kvtcb@bottom\relax%
+      \tcbdimto\tcb@h@page{\textheight}%
+    \fi%
+  }{}%
   \tcb@nested@breakable@restrict@hpage%
 }
 
@@ -194,6 +199,10 @@
 \newbox\tcb@totalupperbox
 \newbox\tcb@totallowerbox
 \newif\iftcb@break@allowed
+\newif\iftcb@nested@retry@overfullsplit
+\newif\iftcb@nested@fullfirstfragment
+\def\tcb@setbox@overfull{0pt}
+\def\tcb@nested@retry@overfullthreshold{\kvtcb@breakminlines\baselineskip}
 
 % Nested breakable boxes are assembled while the parent breakable box is still
 % collecting its vertical list. In that context TeX reports the full page height
@@ -229,9 +238,29 @@
   \fi%
 }
 
+\long\def\tcb@if@contains@nested@hastitle#1#2{%
+  \expandafter\ifx\csname tcb@layer@containsnestedhastitle@\romannumeral\c@tcblayer\endcsname\tcb@layer@containsnestedhastitle@true%
+    #1%
+  \else%
+    #2%
+  \fi%
+}
+
 \long\def\tcb@if@parent@continuedtitle#1#2{%
   \ifnum\c@tcblayer>1\relax%
     \expandafter\ifx\csname tcb@layer@continuedtitle@\romannumeral\numexpr\c@tcblayer-1\relax\endcsname\tcb@layer@continuedtitle@true%
+      #1%
+    \else%
+      #2%
+    \fi%
+  \else%
+    #2%
+  \fi%
+}
+
+\long\def\tcb@if@parent@hastitle#1#2{%
+  \ifnum\c@tcblayer>1\relax%
+    \expandafter\ifx\csname tcb@layer@hastitle@\romannumeral\numexpr\c@tcblayer-1\relax\endcsname\tcb@layer@hastitle@true%
       #1%
     \else%
       #2%
@@ -247,6 +276,59 @@
 \def\tcb@nested@titleless@totitlegap{1.05mm}
 \def\tcb@nested@titleless@betweentitlesgap{1.05mm}
 \def\tcb@nested@titleless@afterbreakgap{1mm}
+\def\tcb@nested@titleless@firstreserve{\numexpr2*\kvtcb@breakminlines\relax\baselineskip}
+\def\tcb@nested@empty@titleless@firstreserve{\kvtcb@breakminlines\baselineskip}
+\def\tcb@nested@tinypagefraction{.30}
+\def\tcb@nested@titlelessfirstfragmentfraction{.94}
+\def\tcb@nested@titlelessaftertitlelessfirstfragmentfraction{.88}
+\def\tcb@nested@titledfirstfragmentfraction{.86}
+\def\tcb@nested@titledaftertitlelessfirstfragmentfraction{.84}
+\def\tcb@nested@skin@empty{empty}
+\def\tcb@nested@skin@emptyfirst{emptyfirst}
+\def\tcb@nested@skin@emptymiddle{emptymiddle}
+\def\tcb@nested@skin@emptylast{emptylast}
+\def\tcb@nested@depth@headroom{0pt}
+
+\def\tcb@nested@calc@depth@headroom{%
+  \def\tcb@nested@depth@headroom{0pt}%
+  \ifnum\c@tcblayer>2\relax%
+    \@tempcnta=\numexpr\c@tcblayer-2\relax%
+    \@whilenum\@tempcnta>0\do{%
+      \tcbdimto\tcb@nested@depth@headroom{\tcb@nested@depth@headroom+\baselineskip}%
+      \advance\@tempcnta by -1\relax%
+    }%
+  \fi%
+}
+
+\def\tcb@nested@hide@innerbreakrules{%
+  \tcb@if@nested@managedbreakable{%
+    \let\kvtcb@top@rule@break=\tcb@zpt%
+    \let\kvtcb@bottom@rule@break=\tcb@zpt%
+  }{}%
+}
+
+\long\def\tcb@if@nested@empty@skin#1#2#3{%
+  \edef\tcb@nested@temp@skin{#1}%
+  \ifx\tcb@nested@temp@skin\tcb@nested@skin@empty%
+    #2%
+  \else\ifx\tcb@nested@temp@skin\tcb@nested@skin@emptyfirst%
+    #2%
+  \else\ifx\tcb@nested@temp@skin\tcb@nested@skin@emptymiddle%
+    #2%
+  \else\ifx\tcb@nested@temp@skin\tcb@nested@skin@emptylast%
+    #2%
+  \else%
+    #3%
+  \fi\fi\fi\fi%
+}
+
+\long\def\tcb@if@nested@all@empty@breakskins#1#2{%
+  \tcb@if@nested@empty@skin{\kvtcb@skin@first}{%
+    \tcb@if@nested@empty@skin{\kvtcb@skin@middle}{%
+      \tcb@if@nested@empty@skin{\kvtcb@skin@last}{#1}{#2}%
+    }{#2}%
+  }{#2}%
+}
 
 \def\tcb@nested@add@titleless@afterbreakgap{%
   \tcb@if@nested@managedbreakable{%
@@ -307,18 +389,24 @@
   \def\tcb@nested@edge@top{0pt}%
   \def\tcb@nested@edge@bottom{0pt}%
   \tcb@if@contains@nested@breakable{%
-    \csname tcb@nested@edgeoverlap@\tcb@split@state\endcsname%
+    \tcb@if@nested@emptybreakskin{}{%
+      \tcb@if@nested@empty@skin{\csname kvtcb@skin@@\tcb@split@state\endcsname}{}{%
+        \csname tcb@nested@edgeoverlap@\tcb@split@state\endcsname%
+      }%
+    }%
   }{}%
 }
 
 \def\tcb@nested@adjust@splitpadding{%
   \tcb@if@contains@nested@breakable{%
-    \tcb@nested@edgeoverlap@first%
-    \tcbdimto\tcb@h@padding@first{\tcb@h@padding@first-\tcb@nested@edge@bottom}%
-    \tcb@nested@edgeoverlap@middle%
-    \tcbdimto\tcb@h@padding@middle{\tcb@h@padding@middle-\tcb@nested@edge@top-\tcb@nested@edge@bottom}%
-    \tcb@nested@edgeoverlap@last%
-    \tcbdimto\tcb@h@padding@last{\tcb@h@padding@last-\tcb@nested@edge@top}%
+    \tcb@if@nested@emptybreakskin{}{%
+      \tcb@nested@edgeoverlap@first%
+      \tcbdimto\tcb@h@padding@first{\tcb@h@padding@first-\tcb@nested@edge@bottom}%
+      \tcb@nested@edgeoverlap@middle%
+      \tcbdimto\tcb@h@padding@middle{\tcb@h@padding@middle-\tcb@nested@edge@top-\tcb@nested@edge@bottom}%
+      \tcb@nested@edgeoverlap@last%
+      \tcbdimto\tcb@h@padding@last{\tcb@h@padding@last-\tcb@nested@edge@top}%
+    }%
   }{}%
 }
 
@@ -353,9 +441,6 @@
     \fi%
     \advance\@tempcnta by 1\relax%
   }%
-  \ifnum\@tempcntb=0\relax%
-    \@tempdima=\@tempdimc%
-  \fi%
 }
 
 \def\tcb@nested@current@pageheight{%
@@ -364,26 +449,72 @@
   \else%
     \@tempdimb=\csname tcb@layer@pageheight@\romannumeral\c@tcblayer\endcsname\relax%
   \fi%
-  \ifnum\c@tcblayer=2\relax%
-    \ifdim\tcb@h@page<.85\textheight\relax%
-      \ifdim\@tempdimb<\tcb@h@page\relax%
-        \@tempdimb=\tcb@h@page\relax%
-      \fi%
+  \ifdim\tcb@h@page<.85\textheight\relax%
+    \ifdim\@tempdimb<\tcb@h@page\relax%
+      \@tempdimb=\tcb@h@page\relax%
     \fi%
   \fi%
 }
 
 \def\tcb@nested@breakable@restrict@hpage{%
   \tcb@if@nested@managedbreakable{%
+    \tcb@nested@fullfirstfragmentfalse%
     \tcb@nested@effective@breakreserve%
     \tcb@nested@current@pageheight%
     \ifnum\c@tcbbreakpart=0\relax%
-      \tcbdimto\tcb@temp{\@tempdimb-\@tempdima-\kvtcb@breakminlines\baselineskip-3\baselineskip/2-\parskip}%
-      \ifnum\c@tcblayer>2\relax%
-        \tcbdimto\tcb@temp{\tcb@temp-\baselineskip/2}%
+      \tcb@if@contains@nested@breakable{%
+        \tcb@nested@calc@depth@headroom%
+      }{%
+        \def\tcb@nested@depth@headroom{0pt}%
+      }%
+      \tcbdimto\tcb@temp{\@tempdimb-\@tempdima}%
+      \ifx\kvtcb@title\@empty%
+        \tcb@if@nested@emptybreakskin{%
+          \tcbdimto\tcb@temp{\tcb@temp-\tcb@nested@empty@titleless@firstreserve}%
+        }{%
+          \tcbdimto\tcb@temp{\tcb@temp-\tcb@nested@titleless@firstreserve}%
+        }%
       \fi%
-      \ifnum\c@tcblayer>3\relax%
-        \tcbdimto\tcb@temp{\tcb@temp-\baselineskip/2}%
+      \ifdim\@tempdimb<\tcb@nested@tinypagefraction\textheight\relax%
+        \tcbdimto\tcb@temp{\textheight-\@tempdima}%
+        \ifx\kvtcb@title\@empty%
+          \tcb@if@nested@emptybreakskin{%
+            \tcbdimto\tcb@temp{\tcb@temp-\tcb@nested@empty@titleless@firstreserve}%
+          }{%
+            \tcbdimto\tcb@temp{\tcb@temp-\tcb@nested@titleless@firstreserve}%
+          }%
+        \fi%
+        \tcb@nested@fullfirstfragmenttrue%
+      \fi%
+      \iftcb@nested@fullfirstfragment%
+      \else%
+        \ifx\kvtcb@title\@empty%
+          \tcb@if@nested@emptybreakskin{%
+            \tcbdimto\tcb@nested@temp{\tcb@nested@titlelessfirstfragmentfraction\textheight-\@tempdima-\tcb@nested@empty@titleless@firstreserve}%
+          }{%
+            \tcb@if@contains@nested@hastitle{%
+              \tcbdimto\tcb@nested@temp{\tcb@nested@titledfirstfragmentfraction\textheight-\@tempdima-\tcb@nested@titleless@firstreserve-\tcb@nested@depth@headroom}%
+            }{%
+              \tcb@if@parent@hastitle{%
+                \tcbdimto\tcb@nested@temp{\tcb@nested@titlelessfirstfragmentfraction\textheight-\@tempdima-\tcb@nested@titleless@firstreserve-\tcb@nested@depth@headroom}%
+              }{%
+                \tcbdimto\tcb@nested@temp{\tcb@nested@titlelessaftertitlelessfirstfragmentfraction\textheight-\@tempdima-\tcb@nested@titleless@firstreserve-\tcb@nested@depth@headroom-\baselineskip}%
+              }%
+            }%
+          }%
+          \ifdim\tcb@temp>\tcb@nested@temp\relax%
+            \let\tcb@temp=\tcb@nested@temp%
+          \fi%
+        \else%
+          \tcb@if@parent@hastitle{%
+            \tcbdimto\tcb@nested@temp{\tcb@nested@titledfirstfragmentfraction\textheight-\@tempdima}%
+          }{%
+            \tcbdimto\tcb@nested@temp{\tcb@nested@titledaftertitlelessfirstfragmentfraction\textheight-\@tempdima}%
+          }%
+          \ifdim\tcb@temp>\tcb@nested@temp\relax%
+            \let\tcb@temp=\tcb@nested@temp%
+          \fi%
+        \fi%
       \fi%
     \else%
       \tcbdimto\tcb@temp{\textheight-\@tempdima}%
@@ -391,7 +522,17 @@
     \ifdim\tcb@temp<\dimexpr\kvtcb@breakminlines\baselineskip+\tcb@h@padtitle+\kvtcb@boxsep*2+\kvtcb@top+\kvtcb@bottom\relax%
       \tcbdimto\tcb@temp{\kvtcb@breakminlines\baselineskip+\tcb@h@padtitle+\kvtcb@boxsep*2+\kvtcb@top+\kvtcb@bottom}%
     \fi%
-    \ifdim\tcb@h@page>\tcb@temp\relax%
+    \ifnum\c@tcbbreakpart=0\relax%
+      \iftcb@nested@fullfirstfragment%
+        \let\tcb@h@page=\tcb@temp%
+      \else\ifdim\tcb@h@page<\dimexpr\kvtcb@breakminlines\baselineskip+\tcb@h@padtitle+\kvtcb@boxsep*2+\kvtcb@top+\kvtcb@bottom\relax%
+        \let\tcb@h@page=\tcb@temp%
+      \else\ifdim\tcb@h@page>\tcb@temp\relax%
+        \let\tcb@h@page=\tcb@temp%
+      \fi%
+      \fi%
+      \fi%
+    \else%
       \let\tcb@h@page=\tcb@temp%
     \fi%
   }{}%
@@ -582,10 +723,17 @@
 
 
 \def\tcb@setbox#1#2#3{%
+  \def\tcb@setbox@overfull{0pt}%
   \setbox#1=\vbox{\unvbox#3}%
   \ifdim\dimexpr\ht#1+\dp#1>#2\relax%
-    %\tcb@warning{Splitted box part too large by \the\dimexpr\ht#1+\dp#1-#2\relax}% switched off (99% useless/annoying)
-    \setbox#1=\vbox to\the\dimexpr#2-\dp#1\relax{\unvbox#1}%
+    \tcbdimto\tcb@setbox@overfull{\ht#1+\dp#1-#2}%
+    \tcb@if@nested@managedbreakable{%
+      % Do not squeeze nested fragments.  Display math and paragraph glue can
+      % otherwise be compressed until following text overlaps the formula area.
+    }{%
+      %\tcb@warning{Splitted box part too large by \the\dimexpr\ht#1+\dp#1-#2\relax}% switched off (99% useless/annoying)
+      \setbox#1=\vbox to\the\dimexpr#2-\dp#1\relax{\unvbox#1}%
+    }%
   \fi%
 }
 
@@ -609,7 +757,18 @@
       \splitdiscards%
       \unvbox\tcb@totalupperbox}%
   \else%
+    \tcb@nested@retry@overfullsplittrue%
     \tcb@setbox@upper{\tcb@split@dim}{\tcb@upperbox}%
+    \tcb@nested@retry@overfullsplitfalse%
+    \tcb@if@nested@managedbreakable{%
+      \ifdim\tcb@setbox@overfull>\tcb@nested@retry@overfullthreshold\relax%
+        \setbox\tcb@totalupperbox=\vbox{%
+          \unvbox\tcb@upperbox%
+          \splitdiscards%
+          \unvbox\tcb@totalupperbox}%
+        \def\tcb@upper@box@badness{1000000}%
+      \fi%
+    }{}%
     \ifdim\dimexpr\tcb@h@upper=0pt\relax%
       \setbox\tcb@totalupperbox=\vbox{%
         \unvbox\tcb@upperbox%
@@ -622,13 +781,27 @@
 }
 
 \def\tcb@split@upper@box{%
-  \vfuzz=\maxdimen\vbadness=10000%
+  \vfuzz=\maxdimen\vbadness=10000\savingvdiscards=1%
   \tcb@vsplit@upper%
   \ifnum\tcb@upper@box@badness=1000000\relax%
     \tcb@warning{The upper box part has become overfull}%
   \fi%
   \tcb@setbox@upper{\tcb@split@dim}{\tcb@upperbox}%
-  \vbadness=\tcb@thevbadness\vfuzz=\tcb@thevfuzz%
+  \tcb@if@nested@managedbreakable{%
+    \ifdim\tcb@setbox@overfull>\tcb@nested@retry@overfullthreshold\relax%
+      \setbox\tcb@totalupperbox=\vbox{%
+        \unvbox\tcb@upperbox%
+        \splitdiscards%
+        \unvbox\tcb@totalupperbox}%
+      \tcbdimto\tcb@split@dim{\tcb@split@dim-\tcb@setbox@overfull-\baselineskip/2}%
+      \ifdim\tcb@split@dim<\kvtcb@breakminlines\baselineskip\relax%
+        \tcbdimto\tcb@split@dim{\kvtcb@breakminlines\baselineskip}%
+      \fi%
+      \tcb@vsplit@upper%
+      \tcb@setbox@upper{\tcb@split@dim}{\tcb@upperbox}%
+    \fi%
+  }{}%
+  \vbadness=\tcb@thevbadness\vfuzz=\tcb@thevfuzz\savingvdiscards=0%
 }
 
 \def\tcb@setbox@lower#1#2{%
@@ -650,7 +823,18 @@
       \splitdiscards%
       \unvbox\tcb@totallowerbox}%
   \else%
+    \tcb@nested@retry@overfullsplittrue%
     \tcb@setbox@lower{\tcb@split@dim}{\tcb@lowerbox}%
+    \tcb@nested@retry@overfullsplitfalse%
+    \tcb@if@nested@managedbreakable{%
+      \ifdim\tcb@setbox@overfull>\tcb@nested@retry@overfullthreshold\relax%
+        \setbox\tcb@totallowerbox=\vbox{%
+          \unvbox\tcb@lowerbox%
+          \splitdiscards%
+          \unvbox\tcb@totallowerbox}%
+        \def\tcb@lower@box@badness{1000000}%
+      \fi%
+    }{}%
     \ifdim\dimexpr\tcb@h@lower=0pt\relax%
       \setbox\tcb@totallowerbox=\vbox{%
         \unvbox\tcb@lowerbox%
@@ -663,13 +847,27 @@
 }
 
 \def\tcb@split@lower@box{%
-  \vfuzz=\maxdimen\vbadness=10000%
+  \vfuzz=\maxdimen\vbadness=10000\savingvdiscards=1%
   \tcb@vsplit@lower%
   \ifnum\tcb@lower@box@badness=1000000\relax%
     \tcb@warning{The lower box part has become overfull}%
   \fi%
   \tcb@setbox@lower{\tcb@split@dim}{\tcb@lowerbox}%
-  \vbadness=\tcb@thevbadness\vfuzz=\tcb@thevfuzz%
+  \tcb@if@nested@managedbreakable{%
+    \ifdim\tcb@setbox@overfull>\tcb@nested@retry@overfullthreshold\relax%
+      \setbox\tcb@totallowerbox=\vbox{%
+        \unvbox\tcb@lowerbox%
+        \splitdiscards%
+        \unvbox\tcb@totallowerbox}%
+      \tcbdimto\tcb@split@dim{\tcb@split@dim-\tcb@setbox@overfull-\baselineskip/2}%
+      \ifdim\tcb@split@dim<\kvtcb@breakminlines\baselineskip\relax%
+        \tcbdimto\tcb@split@dim{\kvtcb@breakminlines\baselineskip}%
+      \fi%
+      \tcb@vsplit@lower%
+      \tcb@setbox@lower{\tcb@split@dim}{\tcb@lowerbox}%
+    \fi%
+  }{}%
+  \vbadness=\tcb@thevbadness\vfuzz=\tcb@thevfuzz\savingvdiscards=0%
 }
 
 % patch for luatex 0.95 (thanks to Jeremy Engel)
@@ -781,6 +979,7 @@
   \edef\kvtcb@skin@@first{\kvtcb@skin@first}%
   \edef\kvtcb@skin@@middle{\kvtcb@skin@middle}%
   \edef\kvtcb@skin@@last{\kvtcb@skin@last}%
+  \tcb@nested@hide@innerbreakrules%
   %
   \let\tcb@h@breaksep@first=\kvtcb@bottomsep%
   \tcbdimto\tcb@h@breaksep@middle{\kvtcb@bottomsep+\kvtcb@topsep}%

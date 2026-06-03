@@ -1,4 +1,4 @@
-pdf=build/compare/patched/a4-nested-title-mix-deep/a4-nested-title-mix-deep.pdf
+pdf=verification/nested-behavior/pdf/a4-nested-title-mix-deep.pdf
 title_mix_clearance=ok
 measurement gap_mm target_mm tolerance_mm
 case-f-title-to-titleless 1.016 1.000 0.250

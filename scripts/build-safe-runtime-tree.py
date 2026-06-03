@@ -19,7 +19,7 @@ def prefixed(name: str) -> str:
     return f"breakble-{name}"
 
 
-def patched_runtime() -> str:
+def breakble_runtime() -> str:
     text = (SOURCE_DIR / "tcolorbox.sty").read_text(encoding="utf-8")
     for src in library_files():
         text = text.replace(src.name, prefixed(src.name))
@@ -55,13 +55,13 @@ def write_tree(path: Path, *, include_wrapper: bool, drop_in: bool = False) -> N
     clean_dir(path)
     if include_wrapper:
         (path / "breakble-tcolorbox.sty").write_text(clean_text(wrapper_text(drop_in=drop_in)), encoding="utf-8")
-    (path / RUNTIME_NAME).write_text(patched_runtime(), encoding="utf-8")
+    (path / RUNTIME_NAME).write_text(breakble_runtime(), encoding="utf-8")
     for src in library_files():
         copy_text(src, path / prefixed(src.name))
 
 
 def write_root_runtime() -> None:
-    (ROOT / RUNTIME_NAME).write_text(patched_runtime(), encoding="utf-8")
+    (ROOT / RUNTIME_NAME).write_text(breakble_runtime(), encoding="utf-8")
     for src in library_files():
         copy_text(src, ROOT / prefixed(src.name))
 
@@ -74,7 +74,7 @@ def assert_no_shadow_names(path: Path) -> None:
         raise SystemExit(f"shadow-prone upstream filenames remain in {path}:\n{joined}")
 
 
-def assert_runtime_patched(path: Path) -> None:
+def assert_runtime_breakble_mapped(path: Path) -> None:
     runtime = path / RUNTIME_NAME
     text = runtime.read_text(encoding="utf-8")
     missing = []
@@ -95,9 +95,9 @@ def main() -> int:
     write_tree(TEXMF_DIR, include_wrapper=True)
     assert_no_shadow_names(DROP_IN_DIR)
     assert_no_shadow_names(TEXMF_DIR)
-    assert_runtime_patched(ROOT)
-    assert_runtime_patched(DROP_IN_DIR)
-    assert_runtime_patched(TEXMF_DIR)
+    assert_runtime_breakble_mapped(ROOT)
+    assert_runtime_breakble_mapped(DROP_IN_DIR)
+    assert_runtime_breakble_mapped(TEXMF_DIR)
     print(f"wrote safe runtime files to {DROP_IN_DIR.relative_to(ROOT)}")
     print(f"wrote safe TEXMF tree to {TEXMF_DIR.relative_to(ROOT)}")
     return 0

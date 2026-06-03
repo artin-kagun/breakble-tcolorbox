@@ -549,11 +549,24 @@ repository.
 - `verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf`:
   stress cases covering mid-page starts, no-title continuation, multi-level
   nesting, and decorated upper/lower content.
+- `verification/nested-behavior/pdf/a4-nested-display-math-overlap.pdf`:
+  regression sample for display math inside nested breakable boxes, checking
+  that the following paragraph is not pulled into the formula area.
+- `verification/nested-behavior/pdf/a4-nested-display-math-overlap-xelatex.pdf`:
+  the same display-math regression sample compiled with XeLaTeX.
+- `verification/nested-behavior/pdf/a4-proof-nested-overlap-uplatex.pdf`:
+  a Japanese proof-style nested display-math sample compiled with upLaTeX.
+- `verification/nested-behavior/pdf/a4-nested-mixed-continuous.pdf`:
+  a continuous multi-level nesting sample with mixed title and no-title
+  continuations.
 - `verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf`:
   titleless nesting at depths 2, 3, 4, 5, and 6.
 - `verification/nested-behavior/pdf/a4-titleless-reach-reference.pdf`:
   a non-nested reference for how far ordinary `tcolorbox` content reaches
   toward the page bottom.
+- `verification/nested-behavior/pdf/b5-nested-breakable-smoke.pdf`:
+  a non-A4 B5 page-size sample used to check that the implementation is not
+  tied to A4 dimensions.
 
 For upstream standalone examples, these PDFs put original output on the left
 and breakble output on the right:
@@ -602,6 +615,13 @@ Nested behavior report:
 Standalone example parity report:
 
 - `verification/example-parity/report.md`
+
+Current verification results show upstream example parity passing for all 3
+example documents, and upstream manual parity passing with 568/568 pages and a
+pixel match. Representative nested samples pass with pdfLaTeX, XeLaTeX, and
+upLaTeX in this environment. LuaLaTeX could not be rendered here because
+`luaotfload` stops before the document is processed with `no writeable cache
+path`.
 
 To regenerate standalone example parity:
 

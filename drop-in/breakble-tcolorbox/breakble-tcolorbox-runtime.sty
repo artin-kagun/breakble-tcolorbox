@@ -1372,6 +1372,8 @@
   \tcb@set@@phantom%
   \tcb@set@@title%
   \tcb@set@@dimensions%
+  \tcb@store@layer@pageheight%
+  \tcb@store@layer@breakreserve%
   \tcb@set@@sidebyside%
   \tcb@set@@upper@and@lower%
 }
@@ -1499,6 +1501,8 @@
 \def\tcb@layer@containsnested@false{false}
 \def\tcb@layer@containsnestedtitle@true{true}
 \def\tcb@layer@containsnestedtitle@false{false}
+\def\tcb@layer@containsnestedhastitle@true{true}
+\def\tcb@layer@containsnestedhastitle@false{false}
 \def\tcb@layer@continuedtitle@true{true}
 \def\tcb@layer@continuedtitle@false{false}
 \def\tcb@layer@hastitle@true{true}
@@ -1506,9 +1510,19 @@
 \def\tcb@nested@managedbreakable@true{true}
 \def\tcb@nested@managedbreakable@false{false}
 \let\tcb@nested@managedbreakable\tcb@nested@managedbreakable@false
+\def\tcb@nested@emptyskin@true{true}
+\def\tcb@nested@emptyskin@false{false}
+\let\tcb@nested@emptyskin\tcb@nested@emptyskin@false
+
+\tcbset{breakble nested empty skin/.code={\let\tcb@nested@emptyskin\tcb@nested@emptyskin@true}}
 
 \def\tcb@reset@nested@managedbreakable{%
   \let\tcb@nested@managedbreakable\tcb@nested@managedbreakable@false%
+}
+
+\def\tcb@reset@nested@boxflags{%
+  \tcb@reset@nested@managedbreakable%
+  \let\tcb@nested@emptyskin\tcb@nested@emptyskin@false%
 }
 
 \def\tcb@mark@nested@managedbreakable{%
@@ -1527,6 +1541,14 @@
   \fi%
 }
 
+\long\def\tcb@if@nested@emptybreakskin#1#2{%
+  \ifx\tcb@nested@emptyskin\tcb@nested@emptyskin@true%
+    #1%
+  \else%
+    #2%
+  \fi%
+}
+
 \def\tcb@store@layer@breakable{%
   \iftcb@isbreakable%
     \expandafter\global\expandafter\let\csname tcb@layer@breakable@\romannumeral\c@tcblayer\endcsname\tcb@layer@breakable@true%
@@ -1538,6 +1560,7 @@
 \def\tcb@reset@layer@containsnested{%
   \expandafter\global\expandafter\let\csname tcb@layer@containsnested@\romannumeral\c@tcblayer\endcsname\tcb@layer@containsnested@false%
   \expandafter\global\expandafter\let\csname tcb@layer@containsnestedtitle@\romannumeral\c@tcblayer\endcsname\tcb@layer@containsnestedtitle@false%
+  \expandafter\global\expandafter\let\csname tcb@layer@containsnestedhastitle@\romannumeral\c@tcblayer\endcsname\tcb@layer@containsnestedhastitle@false%
 }
 
 \def\tcb@store@layer@continuedtitle{%
@@ -1575,13 +1598,34 @@
   }{}%
 }
 
+\def\tcb@mark@ancestor@nested@hastitle{%
+  \tcb@if@nested@managedbreakable{%
+        \ifx\kvtcb@title\@empty%
+        \else%
+          \@tempcnta=1\relax%
+          \@whilenum\@tempcnta<\c@tcblayer\do{%
+            \expandafter\global\expandafter\let\csname tcb@layer@containsnestedhastitle@\romannumeral\@tempcnta\endcsname\tcb@layer@containsnestedhastitle@true%
+            \advance\@tempcnta by 1\relax%
+          }%
+        \fi%
+  }{}%
+}
+
+\def\tcb@nested@set@minpageheight{%
+  \@ifundefined{kvtcb@breakminlines}%
+    {\@tempdimb=2\baselineskip\relax}%
+    {\@tempdimb=\dimexpr\kvtcb@breakminlines\baselineskip\relax}%
+  \advance\@tempdimb by \dimexpr\kvtcb@boxsep*2+\kvtcb@top+\kvtcb@bottom\relax%
+}
+
 \def\tcb@store@layer@pageheight{%
   \begingroup%
   \@tempdima=\dimexpr\pagegoal-\pagetotal\relax%
   \ifdim\pagegoal=16383.99998pt\relax%
     \@tempdima=\dimexpr\vsize-\pagetotal\relax%
   \fi%
-  \ifdim\@tempdima<\baselineskip\relax%
+  \tcb@nested@set@minpageheight%
+  \ifdim\@tempdima<\@tempdimb%
     \@tempdima=\textheight%
   \fi%
   \ifnum\c@tcblayer>1\relax%
@@ -1594,6 +1638,10 @@
         \fi%
       \fi%
     \fi%
+  \fi%
+  \tcb@nested@set@minpageheight%
+  \ifdim\@tempdima<\@tempdimb%
+    \@tempdima=\textheight%
   \fi%
   \expandafter\xdef\csname tcb@layer@pageheight@\romannumeral\c@tcblayer\endcsname{\the\@tempdima}%
   \endgroup%
@@ -1706,7 +1754,7 @@
   \let\tcb@outer@textheight\tcbtextheight%
   \let\tcbtextheight\tcb@zpt%
   \let\tcbtextwidth\tcb@zpt%
-  \tcb@reset@nested@managedbreakable%
+  \tcb@reset@nested@boxflags%
   \tcbset{#1}%
   \tcb@lateoptions@hook\let\tcb@lateoptions@hook\@empty%
   \tcb@afteroptions@hook%
@@ -1721,8 +1769,7 @@
   \tcb@store@layer@hastitle%
   \tcb@mark@ancestor@nested@breakable%
   \tcb@mark@parent@nested@continuedtitle%
-  \tcb@store@layer@pageheight%
-  \tcb@store@layer@breakreserve%
+  \tcb@mark@ancestor@nested@hastitle%
   \let\iftcb@minipage\if@minipage%
   \let\iftcb@nobreak\if@nobreak%
   \let\tcblower\tcb@error@nolower%

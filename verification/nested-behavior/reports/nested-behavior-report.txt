@@ -1,4 +1,4 @@
-pdf=build/compare/patched/a4-nested-behavior/a4-nested-behavior.pdf
+pdf=verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf
 nested_behavior=ok
 first_fragment_gap_limit_pt=70
 heading marker heading_page marker_page gap_pt same_page reach_ok reason

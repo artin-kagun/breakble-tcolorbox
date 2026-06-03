@@ -6,7 +6,7 @@ page content_bottom_y_px bottom_gap_to_textarea_px approx_gap_pt
 3 294 485 485.00
 4 773 6 6.00
 5 390 389 389.00
-6 773 6 6.00
+6 774 5 5.00
 7 475 304 304.00
 8 774 5 5.00
 9 559 220 220.00

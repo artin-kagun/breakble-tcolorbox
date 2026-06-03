@@ -1,4 +1,4 @@
-pdf=build/compare/patched/a4-nested-breakable-stress/a4-nested-breakable-stress.pdf
+pdf=verification/nested-behavior/pdf/a4-nested-breakable-stress.pdf
 reference_page=2
 reference_gap_pt=5.00
 stress_markers=ok

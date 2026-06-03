@@ -1,0 +1,90 @@
+\RequirePackage{iftex}
+\ifLuaTeX
+  \documentclass[a4paper,10pt]{ltjsarticle}
+\else
+  \documentclass[uplatex,dvipdfmx,a4paper,10pt]{jsarticle}
+\fi
+
+\ifLuaTeX
+  \usepackage[margin=22mm]{geometry}
+\else
+  \usepackage[dvipdfmx,margin=22mm]{geometry}
+  \AtBeginDvi{\special{papersize=210mm,297mm}}
+\fi
+\usepackage{amsmath}
+\usepackage[most]{breakble-tcolorbox}
+
+\pagestyle{plain}
+\setlength{\parindent}{1em}
+\setlength{\parskip}{3pt}
+\emergencystretch=2em
+
+\tcbset{
+  jp proof box/.style={
+    enhanced,
+    breakable,
+    boxrule=0.55pt,
+    arc=1mm,
+    outer arc=1mm,
+    left=2.1mm,
+    right=2.1mm,
+    top=1.7mm,
+    bottom=1.7mm,
+    before skip=2.4mm,
+    after skip=2.4mm,
+    fonttitle=\bfseries,
+  },
+  jp outer/.style={jp proof box,colframe=blue!75!black,colback=blue!3!white,colbacktitle=blue!75!black,coltitle=white},
+  jp middle/.style={jp proof box,colframe=green!55!black,colback=green!3!white,colbacktitle=green!55!black,coltitle=white},
+  jp inner/.style={jp proof box,colframe=orange!85!black,colback=orange!3!white,colbacktitle=orange!85!black,coltitle=white},
+}
+
+\newtcolorbox{jpouterbox}[1][]{jp outer,#1}
+\newtcolorbox{jpmiddlebox}[1][]{jp middle,#1}
+\newtcolorbox{jpinnerbox}[1][]{jp inner,#1}
+
+\newcommand{\JPProofParagraph}{%
+線形写像の核と像を比較する場面を想定する。基底を一つ固定し、各ベクトルをその基底で表示してから係数を比較する。ここでは文章が十分に長く続き、途中に数式が入っても、その後の本文が数式の領域へ重ならないことを確認する。
+
+\[
+  a_1 f(v_1)+\cdots+a_r f(v_r)=0
+  \quad\Longrightarrow\quad
+  f(a_1v_1+\cdots+a_rv_r)=0.
+\]
+
+したがって、核に入るベクトルは核の基底で表せる。さらに係数比較を行うと、もとの線形結合に現れる係数がすべてゼロであることが分かる。この段落は改ページ位置の確認のために続けており、入れ子の深さによってページ下端に大きな空白ができないことを目視で確認する。
+}
+
+\begin{document}
+
+{\Large\bfseries 日本語 proof nested overlap sample\par}
+\medskip
+LuaLaTeX と upLaTeX+dvipdfmx の両方で、日本語本文、display math、入れ子の
+breakable box が同じように破綻しないことを確認するためのサンプルである。
+
+\JPProofParagraph
+\JPProofParagraph
+
+\begin{jpouterbox}[title={外側の証明ボックス}]
+外側の本文。ここから中に入れ子の breakable box を置く。
+
+\begin{jpmiddlebox}[notitle after break]
+中間の箱は continuation title を出さない。普通の文章の途中から次ページへ続く場合を確認する。
+
+\begin{jpinnerbox}[title={内側の証明ボックス},notitle after break]
+\JPProofParagraph
+\JPProofParagraph
+\JPProofParagraph
+\JPProofParagraph
+\JPProofParagraph
+\end{jpinnerbox}
+
+内側の証明ボックスの後に続く中間の本文。
+\end{jpmiddlebox}
+
+中間の箱の後に続く外側の本文。
+\end{jpouterbox}
+
+\JPProofParagraph
+
+\end{document}

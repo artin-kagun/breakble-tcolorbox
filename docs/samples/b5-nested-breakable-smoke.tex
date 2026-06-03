@@ -1,0 +1,79 @@
+\documentclass[b5paper,10pt]{article}
+\usepackage[margin=18mm]{geometry}
+\usepackage{amsmath}
+\usepackage{lipsum}
+\usepackage[most]{breakble-tcolorbox}
+
+\pagestyle{plain}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\emergencystretch=2em
+\hbadness=10000
+
+\tcbset{
+  b5box/.style={
+    enhanced,
+    breakable,
+    boxrule=0.55pt,
+    arc=1mm,
+    outer arc=1mm,
+    left=2mm,
+    right=2mm,
+    top=1.6mm,
+    bottom=1.6mm,
+    before skip=2.2mm,
+    after skip=2.2mm,
+    fonttitle=\bfseries,
+  },
+  b5one/.style={b5box,colframe=blue!75!black,colback=blue!3!white,colbacktitle=blue!75!black,coltitle=white},
+  b5two/.style={b5box,colframe=green!55!black,colback=green!3!white,colbacktitle=green!55!black,coltitle=white},
+  b5three/.style={b5box,colframe=orange!85!black,colback=orange!3!white,colbacktitle=orange!85!black,coltitle=white},
+  b5four/.style={b5box,colframe=red!70!black,colback=red!3!white,colbacktitle=red!70!black,coltitle=white},
+}
+
+\newtcolorbox{b5onebox}[1][]{b5one,#1}
+\newtcolorbox{b5twobox}[1][]{b5two,#1}
+\newtcolorbox{b5threebox}[1][]{b5three,#1}
+\newtcolorbox{b5fourbox}[1][]{b5four,#1}
+
+\newcommand{\BfiveMathBlock}{%
+\lipsum[1]
+\[
+  x=c_1u_1+\cdots+c_ku_k+d_1v_1+\cdots+d_rv_r.
+\]
+The sentence after this display is part of the regression check.
+\lipsum[2-4]
+}
+
+\begin{document}
+
+\begin{center}
+{\Large B5 nested breakable smoke sample}\\[2mm]
+{\small Non-A4 page-size check}
+\end{center}
+
+\lipsum[1-3]
+
+\begin{b5onebox}[title={B5 outer},title after break={B5 outer continued}]
+Outer text before the nested boxes.
+
+\begin{b5twobox}
+The second level is titleless.
+
+\begin{b5threebox}[title={B5 third level},notitle after break]
+The third level has no continuation title.
+
+\begin{b5fourbox}
+\BfiveMathBlock
+\end{b5fourbox}
+
+Third level closing text.
+\end{b5threebox}
+
+Second level closing text.
+\end{b5twobox}
+
+Outer closing text.
+\end{b5onebox}
+
+\end{document}

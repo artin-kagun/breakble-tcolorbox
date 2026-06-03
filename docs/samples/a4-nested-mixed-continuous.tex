@@ -1,0 +1,150 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[margin=21mm]{geometry}
+\usepackage{amsmath}
+\usepackage{lipsum}
+\usepackage[most]{breakble-tcolorbox}
+
+\pagestyle{plain}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\emergencystretch=2em
+\hbadness=10000
+
+\tcbset{
+  suite box/.style={
+    enhanced,
+    breakable,
+    boxrule=0.55pt,
+    arc=1mm,
+    outer arc=1mm,
+    left=2.1mm,
+    right=2.1mm,
+    top=1.7mm,
+    bottom=1.7mm,
+    before skip=2.3mm,
+    after skip=2.3mm,
+    fonttitle=\bfseries,
+  },
+  suite one/.style={suite box,colframe=blue!75!black,colback=blue!3!white,colbacktitle=blue!75!black,coltitle=white},
+  suite two/.style={suite box,colframe=green!55!black,colback=green!3!white,colbacktitle=green!55!black,coltitle=white},
+  suite three/.style={suite box,colframe=orange!85!black,colback=orange!3!white,colbacktitle=orange!85!black,coltitle=white},
+  suite four/.style={suite box,colframe=red!70!black,colback=red!3!white,colbacktitle=red!70!black,coltitle=white},
+  suite five/.style={suite box,colframe=purple!70!black,colback=purple!3!white,colbacktitle=purple!70!black,coltitle=white},
+  suite six/.style={suite box,colframe=teal!65!black,colback=teal!3!white,colbacktitle=teal!65!black,coltitle=white},
+  suite underlay/.style={
+    underlay unbroken={\path[fill=black!5] ([yshift=-1.2mm]frame.north west) rectangle ([yshift=-2.0mm]frame.north east);},
+    underlay first={\path[fill=blue!8] ([yshift=-1.2mm]frame.north west) rectangle ([yshift=-2.0mm]frame.north east);},
+    underlay middle={\path[fill=orange!10] ([yshift=-1.2mm]frame.north west) rectangle ([yshift=-2.0mm]frame.north east);},
+    underlay last={\path[fill=green!8] ([yshift=-1.2mm]frame.north west) rectangle ([yshift=-2.0mm]frame.north east);},
+  },
+}
+
+\newtcolorbox{levelone}[1][]{suite one,#1}
+\newtcolorbox{leveltwo}[1][]{suite two,#1}
+\newtcolorbox{levelthree}[1][]{suite three,#1}
+\newtcolorbox{levelfour}[1][]{suite four,#1}
+\newtcolorbox{levelfive}[1][]{suite five,#1}
+\newtcolorbox{levelsix}[1][]{suite six,#1}
+
+\newcommand{\mathblock}{%
+The next display is intentionally surrounded by ordinary prose. The paragraph
+after the display must keep normal spacing and must not collide with the
+formula.
+\[
+  a_1f(v_1)+\cdots+a_rf(v_r)=0
+  \quad\Longrightarrow\quad
+  f(a_1v_1+\cdots+a_rv_r)=0.
+\]
+The paragraph after the display continues here. It should be readable on every
+compiler and should not be pushed into the formula area or detached by a large
+blank space.
+}
+
+\newcommand{\plainrun}{%
+\lipsum[1-3]
+\mathblock
+\lipsum[4-7]
+}
+
+\begin{document}
+
+\begin{center}
+{\Large Nested breakable mixed continuous sample}\\[2mm]
+{\small A4, natural page breaks, mixed title states, depths up to six}
+\end{center}
+
+\lipsum[1-4]
+
+\begin{levelone}[title={L1 titled},title after break={L1 continued}]
+Level 1 begins with a title and a continuation title.
+
+\begin{leveltwo}
+Level 2 has no title. It should not add title-like vertical clearance unless it
+is adjacent to a titled child or parent.
+
+\begin{levelthree}[title={L3 titled},notitle after break]
+Level 3 has an initial title but no continuation title.
+
+\begin{levelfour}
+Level 4 has no title.
+
+\begin{levelfive}[title={L5 titled},title after break={L5 continued}]
+Level 5 has a continuation title.
+
+\begin{levelsix}
+Level 6 has no title and contains the long text.
+
+\plainrun
+
+Level 6 closing text.
+\end{levelsix}
+
+Level 5 closing text.
+\end{levelfive}
+
+Level 4 closing text.
+\end{levelfour}
+
+Level 3 closing text.
+\end{levelthree}
+
+Level 2 closing text.
+\end{leveltwo}
+
+Level 1 closing text.
+\end{levelone}
+
+\lipsum[8-10]
+
+\begin{levelone}[title={Underlay break-state outer},notitle after break]
+This case checks ordinary tcolorbox break-state hooks while nested. The colored
+thin bands inside the box are intentional underlay first, middle, last, and
+unbroken hooks.
+
+\begin{leveltwo}[suite underlay,title={Underlay child},title after break={Underlay child continued}]
+\lipsum[11-12]
+\mathblock
+\lipsum[13-17]
+\end{leveltwo}
+
+Text after the underlay child.
+\end{levelone}
+
+\begin{levelone}
+The last case is fully titleless and follows normal text without an explicit
+page break.
+
+\begin{leveltwo}
+\begin{levelthree}
+\begin{levelfour}
+\plainrun
+\end{levelfour}
+\end{levelthree}
+\end{leveltwo}
+
+End of the continuous titleless case.
+\end{levelone}
+
+\lipsum[18-19]
+
+\end{document}

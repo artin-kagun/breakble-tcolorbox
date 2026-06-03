@@ -1,4 +1,4 @@
-pdf=build/compare/patched/a4-nested-behavior/a4-nested-behavior.pdf
+pdf=verification/nested-behavior/pdf/a4-nested-behavior-side-by-side.pdf
 nested_edge_alignment=ok
 reference_continuation_page=3 reference_top_pt=62.50 reference_body_top_pt=72.00 reference_pixels=6063
 edge marker page parent_color inner_color inset_pt limit_pt result parent_pixels inner_pixels reason
