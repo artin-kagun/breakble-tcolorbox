@@ -1,0 +1,4 @@
+pdf=verification/nested-behavior/pdf/a4-titleless-reach-reference.pdf
+page image_height_px measured_area_bottom_y_px content_bottom_y_px bottom_gap_px
+1 842 778 774 4
+2 842 778 231 547

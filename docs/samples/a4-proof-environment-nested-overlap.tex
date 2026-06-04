@@ -1,0 +1,311 @@
+\RequirePackage{iftex}
+\ifLuaTeX
+  \documentclass[a4paper,11pt]{ltjsarticle}
+  \IfFileExists{luatexja-preset.sty}{\usepackage[haranoaji]{luatexja-preset}}{}
+  \usepackage[a4paper,margin=25mm]{geometry}
+\else
+  \ifXeTeX
+    \documentclass[xelatex,ja=standard,a4paper,11pt]{bxjsarticle}
+    \geometry{a4paper,margin=25mm}
+  \else
+    \documentclass[uplatex,dvipdfmx,a4paper,11pt,nomag]{jsarticle}
+    \IfFileExists{pxchfon.sty}{\usepackage[haranoaji,unicode]{pxchfon}}{}
+    \usepackage[dvipdfmx,a4paper,margin=25mm]{geometry}
+    \AtBeginDvi{\special{papersize=210mm,297mm}}%
+  \fi
+\fi
+
+\usepackage{amsmath,amssymb}
+\usepackage{xparse}
+\usepackage[most]{breakble-tcolorbox}
+
+\pagestyle{plain}
+\emergencystretch=2em
+\hbadness=10000
+
+\providecommand{\zw}{zw}
+
+\tcbset{
+  proof vertical title/.style={
+    detach title,
+    fonttitle=\gtfamily\sffamily\bfseries\upshape,
+    coltitle=black,
+    before skip=6pt,
+    after skip=6pt,
+    separator sign={\ },
+    description delimiters={(}{)\ },
+    after title={\ :\ \ },
+    before upper={\tcbtitle \setlength{\parindent}{1\zw}},
+  },
+}
+
+\newcommand{\subproofmark}{%
+  \tikz[baseline=(subproofmark.base)]%
+    \node[draw,circle,inner sep=0.7pt,line width=0.35pt]%
+      (subproofmark) {\footnotesize$\because$};%
+}
+
+\newcommand{\prooftitle}[1]{%
+  証明\IfNoValueF{#1}{\if\relax\detokenize{#1}\relax\else\ (#1)\fi}%
+}
+\newcommand{\subprooftitle}[1]{%
+  \subproofmark\if\relax\detokenize{#1}\relax\else\ (#1)\fi%
+}
+
+\makeatletter
+\newif\ifproofmarkers
+\ifdefined\ShowProofMarkers
+  \proofmarkerstrue
+\else
+  \proofmarkersfalse
+\fi
+\newcommand{\proofmarkersize}{2.2pt}
+\newcommand{\drawproofmarker}[1]{%
+  \ifproofmarkers
+    \node[
+      fill=black,
+      draw=black,
+      inner sep=0pt,
+      outer sep=0pt,
+      minimum width=\proofmarkersize,
+      minimum height=\proofmarkersize
+    ] at (#1) {};%
+  \fi
+}
+\newcommand{\proofstartmarkers}{%
+  \drawproofmarker{[xshift=0.4pt]frame.north west}%
+  \drawproofmarker{[xshift=-0.4pt]frame.north east}%
+}
+\newcommand{\proofendmarkers}{%
+  \drawproofmarker{[xshift=0.4pt]frame.south west}%
+  \drawproofmarker{[xshift=-0.4pt]frame.south east}%
+}
+\newcommand{\subproofstartmarker}{%
+  \drawproofmarker{[xshift=0.4pt]frame.north west}%
+}
+\newcommand{\subproofendmarker}{%
+  \drawproofmarker{[xshift=0.4pt]frame.south west}%
+}
+\makeatother
+
+\tikzset{proof dotted border/.style={black,line cap=round,dash pattern=on 0pt off 2.3pt}}
+
+\NewTColorBox{ProofTcolorbox}{ g }{
+  proof vertical title,
+  blanker,
+  breakable,
+  left=3mm,
+  right=3mm,
+  top=1mm,
+  bottom=1mm,
+  title={\prooftitle{#1}},
+  borderline vertical={0.8pt}{0pt}{proof dotted border},
+  overlay unbroken={\proofstartmarkers\proofendmarkers},
+  overlay first={\proofstartmarkers},
+  overlay last={\proofendmarkers},
+  after upper=\hfill\ensuremath{\blacksquare},
+}
+
+\NewTColorBox{SubProofTcolorbox}{ O{} }{
+  blanker,
+  breakable,
+  detach title,
+  fonttitle=\gtfamily\sffamily\bfseries\upshape,
+  coltitle=black,
+  before skip=6pt,
+  after skip=6pt,
+  left=3mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm,
+  title={\subprooftitle{#1}},
+  before upper={\tcbtitle\quad\setlength{\parindent}{1\zw}},
+  borderline west={0.8pt}{0pt}{proof dotted border},
+  overlay unbroken={\subproofstartmarker\subproofendmarker},
+  overlay first={\subproofstartmarker},
+  overlay last={\subproofendmarker},
+}
+
+\NewDocumentEnvironment{Proof}{ g }{%
+  \IfNoValueTF{#1}{%
+    \begin{ProofTcolorbox}%
+  }{%
+    \begin{ProofTcolorbox}{#1}%
+  }%
+}{%
+  \end{ProofTcolorbox}%
+}
+
+\NewDocumentEnvironment{SubProof}{ O{} }{%
+  \begin{SubProofTcolorbox}[#1]%
+}{%
+  \end{SubProofTcolorbox}%
+}
+
+\title{Proof/SubProof nested breakable regression sample}
+\author{breakble-tcolorbox verification}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{実際の証明環境に近い入れ子検証}
+
+この文書は、元々の不具合に気づいた証明環境を、\texttt{codexmath.sty}
+から切り離して再現するためのサンプルである。独自の分割補助や
+shipout overlay は使わず、\texttt{breakble-tcolorbox} と普通の
+\texttt{tcolorbox} 設定だけで \texttt{Proof} と \texttt{SubProof} を定義する。
+
+\begin{tcolorbox}[
+  enhanced,
+  breakable,
+  sharp corners,
+  colback=white,
+  colframe=black,
+  fonttitle=\gtfamily\sffamily\bfseries,
+  title={検証用定理}
+]
+$V$ を有限次元ベクトル空間、$f\colon V\to W$ を線形写像とする。
+このとき、核の基底を $V$ の基底へ延長すると、追加した基底ベクトルの像は
+$\operatorname{Im} f$ の基底になる。
+\end{tcolorbox}
+
+\begin{Proof}{長い入れ子証明}
+まず、証明中で使う補題だけを通常の tcolorbox として述べる。
+
+\begin{tcolorbox}[
+  enhanced,
+  breakable,
+  sharp corners,
+  colback=white,
+  colframe=black,
+  fonttitle=\gtfamily\sffamily\bfseries,
+  title={補題}
+]
+$\operatorname{Ker} f$ の基底 $u_1,\dots,u_k$ を
+$V$ の基底 $u_1,\dots,u_k,v_1,\dots,v_r$ へ延長できる。
+\end{tcolorbox}
+
+\begin{SubProof}[補題の証明]
+補題そのものは短いが、その確認の文章が長くなる場合を想定して、ここから
+長い証明を書く。
+
+まず、$\operatorname{Ker} f$ の基底を $u_1,\dots,u_k$ とする。
+$u_1,\dots,u_k$ は $V$ の一次独立なベクトルの組であるから、有限次元ベクトル空間の
+基底延長定理により、これを $V$ の基底
+\[
+  u_1,\dots,u_k,v_1,\dots,v_r
+\]
+へ延長できる。
+
+このとき任意の $x\in V$ は一意的に
+\[
+  x=b_1u_1+\cdots+b_ku_k+a_1v_1+\cdots+a_rv_r
+\]
+と表される。$u_i\in\operatorname{Ker} f$ であるから、$f(x)$ は
+\[
+  f(x)=a_1f(v_1)+\cdots+a_rf(v_r)
+\]
+と書ける。したがって $\operatorname{Im} f$ は
+$f(v_1),\dots,f(v_r)$ によって生成される。
+
+ここで、生成されることだけでは基底であるとはいえないので、一次独立性を別に確認する。
+この部分は補題の中の確認として独立に扱う。
+
+次に、一次独立性だけを別に取り出して確認する。この部分は内側の証明として
+さらに \texttt{SubProof} で入れ子にしておく。
+
+\begin{SubProof}[一次独立性の確認]
+係数 $a_1,\dots,a_r$ が
+\[
+  a_1f(v_1)+\cdots+a_rf(v_r)=0
+\]
+を満たすと仮定する。この等式は
+\[
+  f(a_1v_1+\cdots+a_rv_r)=0
+\]
+を意味するので、$a_1v_1+\cdots+a_rv_r\in\operatorname{Ker} f$ である。
+
+一方で、$\operatorname{Ker} f$ の基底は $u_1,\dots,u_k$ だから、ある係数
+$b_1,\dots,b_k$ が存在して
+\[
+  a_1v_1+\cdots+a_rv_r=b_1u_1+\cdots+b_ku_k
+\]
+と書ける。これを移項すると
+\[
+  b_1u_1+\cdots+b_ku_k-a_1v_1-\cdots-a_rv_r=0
+\]
+である。
+
+$u_1,\dots,u_k,v_1,\dots,v_r$ は $V$ の基底であり、特に一次独立である。
+したがって上の線形結合に現れる係数はすべて $0$ でなければならない。よって
+\[
+  a_1=\cdots=a_r=0
+\]
+を得る。これにより $f(v_1),\dots,f(v_r)$ は一次独立である。
+
+同じ議論を、写像の制限に対しても確認しておく。部分空間 $U\subset V$ を取り、
+$U$ の元が
+\[
+  x=c_1u_1+\cdots+c_ku_k+d_1v_1+\cdots+d_rv_r
+\]
+と表示されているとする。$f(x)=0$ ならば $x\in\operatorname{Ker} f$ であるから、
+$v_i$ 成分はすべて消える。この比較は、基底表示の一意性だけに依存している。
+
+特に、$x$ が部分空間に属している場合でも、基底表示を比較する議論は変わらない。
+したがって核に落ちる成分と像に残る成分は、同じ基底表示の中で区別できる。
+
+最後に、もう一段深い小さな確認も入れる。
+\begin{SubProof}[タイトルつき三段目]
+像の一次独立性を、係数比較だけでもう一度書き直しておく。
+仮に
+\[
+  \lambda_1f(v_1)+\cdots+\lambda_rf(v_r)=0
+\]
+とする。このとき
+\[
+  \lambda_1v_1+\cdots+\lambda_rv_r\in\operatorname{Ker} f
+\]
+である。したがってこのベクトルは $u_1,\dots,u_k$ の線形結合でもある。
+基底
+\[
+  u_1,\dots,u_k,v_1,\dots,v_r
+\]
+に関する表示の一意性から、$\lambda_1=\cdots=\lambda_r=0$ が従う。
+
+この確認により、三段目でも同じ係数比較がそのまま成立することが分かる。
+\end{SubProof}
+
+以上で、$f(v_1),\dots,f(v_r)$ が一次独立であることが分かる。
+\end{SubProof}
+
+以上により、$f(v_1),\dots,f(v_r)$ は $\operatorname{Im} f$ を生成し、しかも
+一次独立である。したがってこれは $\operatorname{Im} f$ の基底である。
+
+最後に、次元の関係も確認しておく。$V$ の基底は
+\[
+  u_1,\dots,u_k,v_1,\dots,v_r
+\]
+であり、$\operatorname{Ker} f$ の基底は $u_1,\dots,u_k$ である。
+また、$\operatorname{Im} f$ の基底は $f(v_1),\dots,f(v_r)$ であるから、
+\[
+  \dim V=k+r,\qquad
+  \dim\operatorname{Ker} f=k,\qquad
+  \dim\operatorname{Im} f=r
+\]
+となる。ゆえに
+\[
+  \dim V=\dim\operatorname{Ker} f+\dim\operatorname{Im} f
+\]
+が従う。
+
+以上で補題の証明が終わる。
+\end{SubProof}
+
+補題の証明を終えたので、もとの主張に戻る。任意の $y\in\operatorname{Im} f$ は
+$y=f(x)$ と書ける。$x$ を基底 $u_1,\dots,u_k,v_1,\dots,v_r$ で展開すれば、
+$u_i$ 成分は $f$ で消えるので、$y$ は $f(v_1),\dots,f(v_r)$ の線形結合である。
+一次独立性は上の入れ子証明で確認した。したがって結論を得る。
+\end{Proof}
+
+\end{document}

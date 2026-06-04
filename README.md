@@ -554,8 +554,13 @@ repository.
   that the following paragraph is not pulled into the formula area.
 - `verification/nested-behavior/pdf/a4-nested-display-math-overlap-xelatex.pdf`:
   the same display-math regression sample compiled with XeLaTeX.
-- `verification/nested-behavior/pdf/a4-proof-nested-overlap-uplatex.pdf`:
-  a Japanese proof-style nested display-math sample compiled with upLaTeX.
+- `verification/nested-behavior/pdf/a4-proof-environment-nested-overlap-uplatex.pdf`:
+  a Japanese Proof/SubProof nested-overlap sample compiled with upLaTeX.
+- `verification/nested-behavior/pdf/a4-proof-environment-nested-overlap-xelatex.pdf`:
+  the same Proof/SubProof nested-overlap sample compiled with XeLaTeX.
+- `verification/nested-behavior/pdf/a4-proof-environment-continuous-inner-break-pdftex-viewable.pdf`:
+  a proof/SubProof sample with embedded Japanese fonts for ordinary PDF
+  viewers. It keeps one long inner `SubProof` open across page breaks.
 - `verification/nested-behavior/pdf/a4-nested-mixed-continuous.pdf`:
   a continuous multi-level nesting sample with mixed title and no-title
   continuations.
@@ -601,7 +606,7 @@ After the script runs, the main outputs are:
 - original manual PDF:
   `verification/manual-parity/sources/original/tcolorbox.pdf`
 - side-by-side manual comparison PDF:
-  `verification/manual-parity/side-by-side/tcolorbox-manual/tcolorbox-side-by-side.pdf`
+  `verification/manual-parity/side-by-side/tcolorbox-manual-png/tcolorbox-side-by-side-png.pdf`
 - report:
   `verification/manual-parity/report.md`
 
@@ -618,10 +623,8 @@ Standalone example parity report:
 
 Current verification results show upstream example parity passing for all 3
 example documents, and upstream manual parity passing with 568/568 pages and a
-pixel match. Representative nested samples pass with pdfLaTeX, XeLaTeX, and
-upLaTeX in this environment. LuaLaTeX could not be rendered here because
-`luaotfload` stops before the document is processed with `no writeable cache
-path`.
+pixel match. Representative nested samples pass with pdfLaTeX, XeLaTeX,
+upLaTeX + dvipdfmx, and LuaLaTeX in this environment.
 
 To regenerate standalone example parity:
 

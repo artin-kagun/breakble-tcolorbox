@@ -1,0 +1,124 @@
+\RequirePackage{iftex}
+\ifLuaTeX
+  \documentclass[a4paper,11pt]{ltjsarticle}
+  \IfFileExists{luatexja-preset.sty}{\usepackage[haranoaji]{luatexja-preset}}{}
+  \usepackage[a4paper,margin=25mm]{geometry}
+\else
+  \ifXeTeX
+    \documentclass[xelatex,ja=standard,a4paper,11pt]{bxjsarticle}
+    \geometry{a4paper,margin=25mm}
+  \else
+    \documentclass[uplatex,dvipdfmx,a4paper,11pt,nomag]{jsarticle}
+    \IfFileExists{pxchfon.sty}{\usepackage[haranoaji,unicode]{pxchfon}}{}
+    \usepackage[dvipdfmx,a4paper,margin=25mm]{geometry}
+    \AtBeginDvi{\special{papersize=210mm,297mm}}%
+  \fi
+\fi
+
+\usepackage{amsmath,amssymb}
+\usepackage{xparse}
+\usepackage[most]{breakble-tcolorbox}
+
+\pagestyle{plain}
+\emergencystretch=2em
+\hbadness=10000
+\providecommand{\zw}{zw}
+
+\tikzset{mark border/.style={black,line cap=round,dash pattern=on 0pt off 2.3pt}}
+
+\NewTColorBox{OuterProofBox}{ m }{
+  blanker,
+  breakable,
+  detach title,
+  fonttitle=\gtfamily\sffamily\bfseries\upshape,
+  coltitle=black,
+  before skip=6pt,
+  after skip=6pt,
+  left=3mm,
+  right=3mm,
+  top=1mm,
+  bottom=1mm,
+  title={OUTER #1},
+  before upper={\tcbtitle\quad\setlength{\parindent}{1\zw}},
+  borderline vertical={0.8pt}{0pt}{mark border},
+}
+
+\NewTColorBox{NestedProofBox}{ m }{
+  blanker,
+  breakable,
+  detach title,
+  fonttitle=\gtfamily\sffamily\bfseries\upshape,
+  coltitle=black,
+  before skip=6pt,
+  after skip=6pt,
+  left=3mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm,
+  title={#1},
+  before upper={\tcbtitle\quad\setlength{\parindent}{1\zw}},
+  borderline west={0.8pt}{0pt}{mark border},
+}
+
+\newcommand{\markedpara}[2]{%
+  \textbf{#1}\quad
+  これは入れ子の分割で消えてはいけない確認用の段落である。
+  任意の $x\in V$ を
+  \[
+    x=b_1u_1+\cdots+b_ku_k+a_1v_1+\cdots+a_rv_r
+  \]
+  と書き、係数比較を行う。ここで表示式の前後に通常の文章があり、
+  改ページ位置が数式だけに引きずられないことを確認する。
+  #2
+
+}
+
+\title{Nested parent tail regression}
+\author{breakble-tcolorbox verification}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{親の後続本文が消えないこと}
+
+このサンプルでは、深い入れ子の直後にある親側本文に英字マーカーを付ける。
+PDF でもテキスト抽出でも、すべてのマーカーが見える必要がある。
+
+\begin{OuterProofBox}{MARK-OUTER-TITLE}
+MARK-OUTER-BEFORE. 外側本文の開始。
+
+\begin{NestedProofBox}{MARK-L1-TITLE}
+\markedpara{MARK-L1-BEFORE}{L1 before nested box.}
+
+\begin{NestedProofBox}{MARK-L2-TITLE}
+\markedpara{MARK-L2-BEFORE}{L2 before nested box.}
+
+\begin{NestedProofBox}{MARK-L3-TITLE}
+\markedpara{MARK-L3-A}{L3 first paragraph.}
+\markedpara{MARK-L3-B}{L3 second paragraph.}
+\markedpara{MARK-L3-C}{L3 third paragraph.}
+\markedpara{MARK-L3-D}{L3 fourth paragraph.}
+\markedpara{MARK-L3-E}{L3 fifth paragraph.}
+\markedpara{MARK-L3-F}{L3 sixth paragraph.}
+\end{NestedProofBox}
+
+MARK-L2-AFTER-DEEP. これは三段目の入れ子が終わった直後の二段目本文である。
+この行が抜けたり、ページ下に押し出されて見えなくなったりしてはいけない。
+
+\markedpara{MARK-L2-TAIL}{L2 tail after the deepest box.}
+\end{NestedProofBox}
+
+MARK-L1-AFTER-L2. これは二段目の入れ子が終わった直後の一段目本文である。
+ここも入れ子の分割後に必ず見える必要がある。
+
+\markedpara{MARK-L1-TAIL}{L1 tail after level 2.}
+\end{NestedProofBox}
+
+MARK-OUTER-AFTER-L1. これは一段目の入れ子が終わった後の外側本文である。
+最終ページに残らなければ、この実装は親の後続本文を壊している。
+
+MARK-OUTER-END.
+\end{OuterProofBox}
+
+\end{document}

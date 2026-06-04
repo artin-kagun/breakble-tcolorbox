@@ -1,6 +1,6 @@
 pdf=verification/nested-behavior/pdf/a4-nested-display-math-overlap.pdf
 source=docs/samples/a4-nested-display-math-overlap.tex
-Pages:          4
+Pages:          3
 Page size:      595.276 x 841.89 pts (A4) (rotated 0 degrees)
 log=ok
 display_math_overlap_text=ok

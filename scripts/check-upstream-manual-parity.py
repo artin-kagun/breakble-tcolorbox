@@ -3,8 +3,10 @@ import filecmp
 import os
 import re
 import shutil
+import struct
 import subprocess
 import sys
+import zlib
 from pathlib import Path
 
 
@@ -167,8 +169,84 @@ def render_pdf(pdf: Path, out_dir: Path) -> list[Path]:
     return sorted(out_dir.glob("page-*.png"))
 
 
+def png_rgb_rows(path: Path) -> tuple[int, int, list[bytes]]:
+    data = path.read_bytes()
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        raise RuntimeError(f"not a PNG file: {path}")
+    index = 8
+    idat: list[bytes] = []
+    width = height = bit_depth = color_type = interlace = None
+    while index < len(data):
+        length = struct.unpack(">I", data[index : index + 4])[0]
+        chunk_type = data[index + 4 : index + 8]
+        chunk = data[index + 8 : index + 8 + length]
+        if chunk_type == b"IHDR":
+            width, height, bit_depth, color_type, _compression, _filter, interlace = struct.unpack(
+                ">IIBBBBB", chunk
+            )
+        elif chunk_type == b"IDAT":
+            idat.append(chunk)
+        elif chunk_type == b"IEND":
+            break
+        index += 12 + length
+
+    if not (bit_depth == 8 and color_type == 2 and interlace == 0):
+        raise RuntimeError(f"unsupported PNG format for pixel comparison: {path}")
+
+    def paeth(left: int, up: int, up_left: int) -> int:
+        predictor = left + up - up_left
+        pa = abs(predictor - left)
+        pb = abs(predictor - up)
+        pc = abs(predictor - up_left)
+        if pa <= pb and pa <= pc:
+            return left
+        if pb <= pc:
+            return up
+        return up_left
+
+    raw = zlib.decompress(b"".join(idat))
+    bytes_per_pixel = 3
+    stride = width * bytes_per_pixel
+    rows: list[bytes] = []
+    position = 0
+    previous = bytearray(stride)
+    for _y in range(height):
+        filter_type = raw[position]
+        position += 1
+        scanline = bytearray(raw[position : position + stride])
+        position += stride
+        row = bytearray(stride)
+        for offset, value in enumerate(scanline):
+            left = row[offset - bytes_per_pixel] if offset >= bytes_per_pixel else 0
+            up = previous[offset]
+            up_left = previous[offset - bytes_per_pixel] if offset >= bytes_per_pixel else 0
+            if filter_type == 0:
+                row[offset] = value
+            elif filter_type == 1:
+                row[offset] = (value + left) & 0xFF
+            elif filter_type == 2:
+                row[offset] = (value + up) & 0xFF
+            elif filter_type == 3:
+                row[offset] = (value + ((left + up) // 2)) & 0xFF
+            elif filter_type == 4:
+                row[offset] = (value + paeth(left, up, up_left)) & 0xFF
+            else:
+                raise RuntimeError(f"unsupported PNG filter {filter_type} in {path}")
+        rows.append(bytes(row))
+        previous = row
+    return width, height, rows
+
+
+def png_pixels_equal(left: Path, right: Path) -> bool:
+    if filecmp.cmp(left, right, shallow=False):
+        return True
+    left_width, left_height, left_rows = png_rgb_rows(left)
+    right_width, right_height, right_rows = png_rgb_rows(right)
+    return (left_width, left_height, left_rows) == (right_width, right_height, right_rows)
+
+
 def make_side_by_side(original_pdf: Path, breakble_pdf: Path, out_dir: Path) -> Path:
-    run(
+    completed = subprocess.run(
         [
             sys.executable,
             str(ROOT / "scripts" / "make-a4-side-by-side-comparison.py"),
@@ -176,9 +254,37 @@ def make_side_by_side(original_pdf: Path, breakble_pdf: Path, out_dir: Path) -> 
             str(breakble_pdf),
             str(out_dir),
         ],
-        stdout=subprocess.DEVNULL,
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=True,
     )
-    return out_dir / f"{original_pdf.stem}-side-by-side.pdf"
+    output = completed.stdout.strip().splitlines()
+    if not output:
+        raise RuntimeError("side-by-side comparison script produced no output path")
+    path = Path(output[-1])
+    if not path.is_absolute():
+        path = ROOT / path
+    return path
+
+
+def existing_or_make_manual_side_by_side(original_pdf: Path, breakble_pdf: Path) -> Path:
+    png_dir = BUILD_DIR / "side-by-side" / "tcolorbox-manual-png"
+    png_pdf = png_dir / f"{original_pdf.stem}-side-by-side-png.pdf"
+    if png_pdf.exists():
+        return png_pdf
+
+    pdf_dir = BUILD_DIR / "side-by-side" / "tcolorbox-manual"
+    pdf_png = pdf_dir / f"{original_pdf.stem}-side-by-side-png.pdf"
+    if pdf_png.exists():
+        return pdf_png
+
+    pdf = pdf_dir / f"{original_pdf.stem}-side-by-side.pdf"
+    if pdf.exists():
+        return pdf
+
+    return make_side_by_side(original_pdf, breakble_pdf, png_dir)
 
 
 def relative(path: Path) -> str:
@@ -227,7 +333,7 @@ def main() -> int:
             original_pngs = render_pdf(original_pdf, BUILD_DIR / "render" / "original")
             breakble_pngs = render_pdf(breakble_pdf, BUILD_DIR / "render" / "breakble")
             for page, (left, right) in enumerate(zip(original_pngs, breakble_pngs), start=1):
-                if not filecmp.cmp(left, right, shallow=False):
+                if not png_pixels_equal(left, right):
                     differing.append(page)
             if differing:
                 failures.append(f"pixel differs on pages {differing}")
@@ -235,11 +341,7 @@ def main() -> int:
             else:
                 rows.append(("pixel", "match"))
 
-        side_by_side = make_side_by_side(
-            original_pdf,
-            breakble_pdf,
-            BUILD_DIR / "side-by-side" / "tcolorbox-manual",
-        )
+        side_by_side = existing_or_make_manual_side_by_side(original_pdf, breakble_pdf)
         rows.append(("side-by-side", relative(side_by_side)))
     except Exception as exc:
         failures.append(str(exc))

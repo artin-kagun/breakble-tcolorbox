@@ -1,15 +1,29 @@
 \RequirePackage{iftex}
 \ifLuaTeX
   \documentclass[a4paper,10pt]{ltjsarticle}
+  \IfFileExists{luatexja-preset.sty}{\usepackage[haranoaji]{luatexja-preset}}{}
 \else
-  \documentclass[uplatex,dvipdfmx,a4paper,10pt]{jsarticle}
+  \ifXeTeX
+    \documentclass[a4paper,10pt]{article}
+    \usepackage{fontspec}
+    \usepackage{xeCJK}
+    \setCJKmainfont{HaranoAjiMincho-Regular.otf}[BoldFont=HaranoAjiGothic-Bold.otf]
+    \setCJKsansfont{HaranoAjiGothic-Medium.otf}[BoldFont=HaranoAjiGothic-Bold.otf]
+  \else
+    \documentclass[uplatex,dvipdfmx,a4paper,10pt]{jsarticle}
+    \IfFileExists{pxchfon.sty}{\usepackage[haranoaji,unicode]{pxchfon}}{}
+  \fi
 \fi
 
 \ifLuaTeX
   \usepackage[margin=22mm]{geometry}
 \else
-  \usepackage[dvipdfmx,margin=22mm]{geometry}
-  \AtBeginDvi{\special{papersize=210mm,297mm}}
+  \ifXeTeX
+    \usepackage[margin=22mm]{geometry}
+  \else
+    \usepackage[dvipdfmx,margin=22mm]{geometry}
+    \AtBeginDvi{\special{papersize=210mm,297mm}}
+  \fi
 \fi
 \usepackage{amsmath}
 \usepackage[most]{breakble-tcolorbox}

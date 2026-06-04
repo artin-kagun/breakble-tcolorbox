@@ -1525,6 +1525,54 @@
   \let\tcb@nested@emptyskin\tcb@nested@emptyskin@false%
 }
 
+\def\tcb@store@layer@entrycolor{%
+  \expandafter\global\expandafter\let\csname tcb@layer@entrycolor@\romannumeral\c@tcblayer\endcsname\current@color%
+  \ifdefined\XC@current@color%
+    \expandafter\global\expandafter\let\csname tcb@layer@entryxcolor@\romannumeral\c@tcblayer\endcsname\XC@current@color%
+  \fi%
+}
+
+\def\tcb@restore@layer@entrycolor{%
+  \expandafter\ifx\csname tcb@layer@entrycolor@\romannumeral\c@tcblayer\endcsname\relax%
+    \normalcolor%
+  \else%
+    \expandafter\let\expandafter\current@color\csname tcb@layer@entrycolor@\romannumeral\c@tcblayer\endcsname%
+    \ifdefined\XC@current@color%
+      \expandafter\ifx\csname tcb@layer@entryxcolor@\romannumeral\c@tcblayer\endcsname\relax%
+      \else%
+        \expandafter\let\expandafter\XC@current@color\csname tcb@layer@entryxcolor@\romannumeral\c@tcblayer\endcsname%
+      \fi%
+    \fi%
+    \set@color%
+  \fi%
+}
+
+\let\tcb@restore@aftergroup@color\default@color
+\def\tcb@restore@aftergroup@entrycolor{%
+  \ifx\tcb@restore@aftergroup@color\relax%
+    \normalcolor%
+  \else%
+    \let\current@color\tcb@restore@aftergroup@color%
+    \ifdefined\XC@current@color%
+      \ifx\tcb@restore@aftergroup@xcolor\relax%
+      \else%
+        \let\XC@current@color\tcb@restore@aftergroup@xcolor%
+      \fi%
+    \fi%
+    \set@color%
+  \fi%
+}
+
+\def\tcb@prepare@restore@after@environment{%
+  \expandafter\global\expandafter\let\expandafter\tcb@restore@aftergroup@color\csname tcb@layer@entrycolor@\romannumeral\c@tcblayer\endcsname%
+  \ifdefined\XC@current@color%
+    \expandafter\global\expandafter\let\expandafter\tcb@restore@aftergroup@xcolor\csname tcb@layer@entryxcolor@\romannumeral\c@tcblayer\endcsname%
+  \else%
+    \global\let\tcb@restore@aftergroup@xcolor\relax%
+  \fi%
+  \gdef\tcb@restore@after@environment{\aftergroup\tcb@restore@aftergroup@entrycolor}%
+}
+
 \def\tcb@mark@nested@managedbreakable{%
   \ifnum\c@tcblayer>1\relax%
     \expandafter\ifx\csname tcb@layer@breakable@\romannumeral\numexpr\c@tcblayer-1\relax\endcsname\tcb@layer@breakable@true%
@@ -1571,12 +1619,24 @@
   \fi%
 }
 
-\def\tcb@store@layer@hastitle{%
+\long\def\tcb@if@current@has@titletext#1#2{%
   \ifx\kvtcb@title\@empty%
-    \expandafter\global\expandafter\let\csname tcb@layer@hastitle@\romannumeral\c@tcblayer\endcsname\tcb@layer@hastitle@false%
+    \ifx\tcbtitletext\@empty%
+      #2%
+    \else%
+      #1%
+    \fi%
   \else%
-    \expandafter\global\expandafter\let\csname tcb@layer@hastitle@\romannumeral\c@tcblayer\endcsname\tcb@layer@hastitle@true%
+    #1%
   \fi%
+}
+
+\def\tcb@store@layer@hastitle{%
+  \tcb@if@current@has@titletext{%
+    \expandafter\global\expandafter\let\csname tcb@layer@hastitle@\romannumeral\c@tcblayer\endcsname\tcb@layer@hastitle@true%
+  }{%
+    \expandafter\global\expandafter\let\csname tcb@layer@hastitle@\romannumeral\c@tcblayer\endcsname\tcb@layer@hastitle@false%
+  }%
 }
 
 \def\tcb@mark@ancestor@nested@breakable{%
@@ -1600,14 +1660,13 @@
 
 \def\tcb@mark@ancestor@nested@hastitle{%
   \tcb@if@nested@managedbreakable{%
-        \ifx\kvtcb@title\@empty%
-        \else%
+        \tcb@if@current@has@titletext{%
           \@tempcnta=1\relax%
           \@whilenum\@tempcnta<\c@tcblayer\do{%
             \expandafter\global\expandafter\let\csname tcb@layer@containsnestedhastitle@\romannumeral\@tempcnta\endcsname\tcb@layer@containsnestedhastitle@true%
             \advance\@tempcnta by 1\relax%
           }%
-        \fi%
+        }{}%
   }{}%
 }
 
@@ -1631,11 +1690,8 @@
   \ifnum\c@tcblayer>1\relax%
     \expandafter\ifx\csname tcb@layer@breakable@\romannumeral\numexpr\c@tcblayer-1\relax\endcsname\tcb@layer@breakable@true%
       \@tempdimb=\csname tcb@layer@pageheight@\romannumeral\numexpr\c@tcblayer-1\relax\endcsname\relax%
-      \advance\@tempdimb by -\pagetotal%
-      \ifdim\@tempdimb>\baselineskip\relax%
-        \ifdim\@tempdima>\@tempdimb%
-          \@tempdima=\@tempdimb%
-        \fi%
+      \ifdim\@tempdima>\@tempdimb%
+        \@tempdima=\@tempdimb%
       \fi%
     \fi%
   \fi%
@@ -1690,6 +1746,7 @@
 \def\tcb@layer@inc{%
   \tcb@count@boxes%
   \global\advance\c@tcblayer 1\relax%
+  \tcb@store@layer@entrycolor%
   \ifnum\c@tcblayer>1\relax%
     \tcb@allow@nested@breakable%
   \else%
@@ -1786,6 +1843,10 @@
 \let\tcolorbox\tcb@colorbox
 
 \def\tcb@endboxanddraw{%
+  \tcb@if@nested@managedbreakable{%
+    \tcb@prepare@restore@after@environment%
+    \tcb@restore@after@environment%
+  }{}%
   \tcb@insert@after@part%
   \end{tcb@savebox}%
   \UseTaggingSocket{tcb/box/draw}{}{\tcb@draw@color@box}%

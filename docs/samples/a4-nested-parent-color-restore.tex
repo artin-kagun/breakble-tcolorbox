@@ -1,0 +1,65 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{xcolor}
+\usepackage[most]{breakble-tcolorbox}
+
+\pagestyle{plain}
+\setlength{\parindent}{0pt}
+
+\newtcolorbox{ParentColorBox}{
+  enhanced,
+  breakable,
+  colback=blue!3,
+  colframe=blue!70!black,
+  colupper=blue!70!black,
+  title={Parent colupper stays blue},
+  before skip=6pt,
+  after skip=6pt,
+}
+
+\newtcolorbox{ChildColorBox}{
+  enhanced,
+  breakable,
+  colback=green!4,
+  colframe=green!45!black,
+  colupper=green!45!black,
+  title={Nested child is green},
+  before skip=6pt,
+  after skip=6pt,
+}
+
+\newcommand{\filltext}[1]{%
+  #1. This paragraph is intentionally ordinary text. It is repeated so that the
+  nested breakable box has to split while the parent box continues afterwards.
+  The parent text after the nested box must still use the parent color, not the
+  nested child color and not the document default color.
+
+}
+
+\begin{document}
+
+\section*{Nested Color Restore Regression}
+
+\begin{ParentColorBox}
+PARENT-BEFORE should be blue.
+
+\begin{ChildColorBox}
+\filltext{CHILD-1}
+\filltext{CHILD-2}
+\filltext{CHILD-3}
+\filltext{CHILD-4}
+\filltext{CHILD-5}
+\filltext{CHILD-6}
+\filltext{CHILD-7}
+\filltext{CHILD-8}
+\filltext{CHILD-9}
+\filltext{CHILD-10}
+\end{ChildColorBox}
+
+PARENT-AFTER should still be blue. If this line is black, white, or green, the
+nested color stack leaked into the parent text.
+
+\filltext{PARENT-TAIL}
+\end{ParentColorBox}
+
+\end{document}

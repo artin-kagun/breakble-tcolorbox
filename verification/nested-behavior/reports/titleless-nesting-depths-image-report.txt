@@ -1,0 +1,13 @@
+pdf=verification/nested-behavior/pdf/a4-titleless-nesting-depths.pdf
+page image_height_px measured_area_bottom_y_px content_bottom_y_px bottom_gap_px
+1 842 778 145 633
+2 842 778 689 89
+3 842 778 377 401
+4 842 778 711 67
+5 842 778 450 328
+6 842 778 734 44
+7 842 778 510 268
+8 842 778 751 27
+9 842 778 570 208
+10 842 778 778 0
+11 842 778 619 159

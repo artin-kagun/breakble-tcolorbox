@@ -1,0 +1,157 @@
+\RequirePackage{iftex}
+\ifLuaTeX
+  \documentclass[a4paper,11pt]{ltjsarticle}
+  \IfFileExists{luatexja-preset.sty}{\usepackage[haranoaji]{luatexja-preset}}{}
+  \usepackage[a4paper,margin=25mm]{geometry}
+\else
+  \ifXeTeX
+    \documentclass[xelatex,ja=standard,a4paper,11pt]{bxjsarticle}
+    \geometry{a4paper,margin=25mm}
+  \else
+    \documentclass[uplatex,dvipdfmx,a4paper,11pt,nomag]{jsarticle}
+    \IfFileExists{pxchfon.sty}{\usepackage[haranoaji,unicode]{pxchfon}}{}
+    \usepackage[dvipdfmx,a4paper,margin=25mm]{geometry}
+    \AtBeginDvi{\special{papersize=210mm,297mm}}%
+  \fi
+\fi
+
+\usepackage{amsmath,amssymb}
+\usepackage{xparse}
+\usepackage[most]{breakble-tcolorbox}
+
+\pagestyle{plain}
+\emergencystretch=2em
+\hbadness=10000
+\providecommand{\zw}{zw}
+
+\tcbset{
+  proof vertical title/.style={
+    detach title,
+    fonttitle=\gtfamily\sffamily\bfseries\upshape,
+    coltitle=black,
+    before skip=6pt,
+    after skip=6pt,
+    separator sign={\ },
+    description delimiters={(}{)\ },
+    after title={\ :\ \ },
+    before upper={\tcbtitle \setlength{\parindent}{1\zw}},
+  },
+}
+
+\newcommand{\subproofmark}{%
+  \tikz[baseline=(subproofmark.base)]%
+    \node[draw,circle,inner sep=0.7pt,line width=0.35pt]%
+      (subproofmark) {\footnotesize$\because$};%
+}
+\newcommand{\prooftitle}[1]{%
+  証明\IfNoValueF{#1}{\if\relax\detokenize{#1}\relax\else\ (#1)\fi}%
+}
+\newcommand{\subprooftitle}[1]{%
+  \subproofmark\if\relax\detokenize{#1}\relax\else\ (#1)\fi%
+}
+
+\tikzset{proof dotted border/.style={black,line cap=round,dash pattern=on 0pt off 2.3pt}}
+
+\NewTColorBox{ProofTcolorbox}{ g }{
+  proof vertical title,
+  blanker,
+  breakable,
+  left=3mm,
+  right=3mm,
+  top=1mm,
+  bottom=1mm,
+  title={\prooftitle{#1}},
+  borderline vertical={0.8pt}{0pt}{proof dotted border},
+  after upper=\hfill\ensuremath{\blacksquare},
+}
+
+\NewTColorBox{SubProofTcolorbox}{ O{} }{
+  blanker,
+  breakable,
+  detach title,
+  fonttitle=\gtfamily\sffamily\bfseries\upshape,
+  coltitle=black,
+  before skip=6pt,
+  after skip=6pt,
+  left=3mm,
+  right=2mm,
+  top=1mm,
+  bottom=1mm,
+  title={\subprooftitle{#1}},
+  before upper={\tcbtitle\quad\setlength{\parindent}{1\zw}},
+  borderline west={0.8pt}{0pt}{proof dotted border},
+}
+
+\NewDocumentEnvironment{Proof}{ g }{%
+  \IfNoValueTF{#1}{%
+    \begin{ProofTcolorbox}%
+  }{%
+    \begin{ProofTcolorbox}{#1}%
+  }%
+}{%
+  \end{ProofTcolorbox}%
+}
+
+\NewDocumentEnvironment{SubProof}{ O{} }{%
+  \begin{SubProofTcolorbox}[#1]%
+}{%
+  \end{SubProofTcolorbox}%
+}
+
+\newcommand{\continuousproofparagraph}[1]{%
+  #1回目の確認として、$V$ の基底
+  \[
+    u_1,\dots,u_k,v_1,\dots,v_r
+  \]
+  に関する表示を比べる。任意の $x\in V$ は
+  \[
+    x=b_1u_1+\cdots+b_ku_k+a_1v_1+\cdots+a_rv_r
+  \]
+  と一意的に書ける。ここで $f(x)=0$ ならば、像に残る成分の係数は
+  $a_1=\cdots=a_r=0$ でなければならない。したがって、核に落ちる部分と
+  像に残る部分は、同じ基底表示の中で分離して扱える。
+
+}
+
+\title{Continuous SubProof page break sample}
+\author{breakble-tcolorbox verification}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{一本の内側 SubProof がページをまたぐ検証}
+
+このPDFでは、内側の \texttt{SubProof} を途中で閉じたり、新しい
+\texttt{SubProof} を開始したりしない。一本の入れ子ボックスがそのまま
+ページをまたぐとき、左側の破線が不自然に重なったり途切れたりしないことを確認する。
+
+\begin{Proof}{連続する内側証明}
+外側の証明を少し進めてから、長い内側証明に入る。
+
+\begin{SubProof}[ページをまたぐ一本の確認]
+\continuousproofparagraph{1}
+\continuousproofparagraph{2}
+\continuousproofparagraph{3}
+\continuousproofparagraph{4}
+\continuousproofparagraph{5}
+\continuousproofparagraph{6}
+\continuousproofparagraph{7}
+\continuousproofparagraph{8}
+\continuousproofparagraph{9}
+\continuousproofparagraph{10}
+\continuousproofparagraph{11}
+\continuousproofparagraph{12}
+\continuousproofparagraph{13}
+\continuousproofparagraph{14}
+\continuousproofparagraph{15}
+\continuousproofparagraph{16}
+\continuousproofparagraph{17}
+\continuousproofparagraph{18}
+\end{SubProof}
+
+内側証明の後に、外側の証明へ戻る。この行は、入れ子ボックスの終了後に
+外側のボックスが自然に続くことを確認するために置いている。
+\end{Proof}
+
+\end{document}
